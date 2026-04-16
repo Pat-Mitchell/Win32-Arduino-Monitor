@@ -1,0 +1,143 @@
+─────── ⋆⋅☆⋅⋆ ────────
+====== RC Circuits =======
+─────── ⋆⋅☆⋅⋆ ────────
+
+Capacitors: a device that stores electrical energy by accumulating electric charges on two closely spaced surfaces that are insulated from each other. It is a passive electronic component with two terminals.
+
+The utility of a capacitor depends on its capacitance, the ability of an object to store electrical charge. It is measured by the change in charge in response to a difference in electric potential, expressed as the ratio of those quantities. Two common notions of capacitance are self capacitance (the electric potential is measured between the object and ground) and mutual capacitance (measured between two components). Mutual capacitance is particularly important in the operation of capacitors.
+
+A common form of mutual capacitance is a parallel-plate capacitor, which consists of two conductive plates insulated from each other (usually sandwiching a dielectric material).
+	If the charges on the plates are +q and -q and V gives the voltage between the plates, then the capacitance C (measured in Farads) is given by
+	C = q / V
+The energy stored in a capacitor is found with 
+	W_charging = 0.5 * C * V ^ 2
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+Why capacitors block DC but pass AC
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+In DC circuits: A capacitor acts as a short circuit at the initial stage. A fully charged capacitor behaves as an open circuit. Capacitors resist a change in voltage.
+
+During the charging stage, electrons accumulate on oneS surface of the capacitor and push others off the other surface. This creates a temporary flow of current. Once the surface becomes saturated and the voltage of the capacitor equals the power supply, current becomes zero. It behaves as an open circuit. Once the power supply is lowered or turned off, the capacitor discharges. The flow of electricity is reverse from the charging direction.
+
+In AC circuits, the alternating current periodically changes direction of the voltage. The capacitor is allowed to charge and discharge continuously, enabling current to flow through the circuit. Higher frequencies result in lower capacitive reactance, making it easier for AC signals to pass through.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+      Charge/Discharge Curves
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+The charging equation is:
+  V(t) = V_in × (1 - e^(-t/τ))
+     Where:
+	V_in = power supply voltage
+	t = time
+	τ = The time constance RC
+
+The discharge equation is:
+  V(t) = V_0 × e^(-t/τ)
+    Where:
+	V_0 = the voltage discharge from the capacitor
+	t = time
+	τ = The time constance RC
+
+For practical purposes, after five time constants, the capacitor is considered fully charged/discharged as it approaches the asymptote of V_in or 0 due to the minor difference value.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+      Time Constant τ (Tau)
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+τ = RC (measured in seconds)
+
+τ can be found by identifying the maximum voltage change that the circuit will reach after an "infinite" amount of time. At 1τ unit of time, the voltage will be at 63.2% of the final charge. 
+
+Important to note that C is measured in F and not nF or uF.
+τ scales proportionally and linearly with a change in R or C.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+      Electrolytic Capacitor
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+A polarized capacitor whose anode or positive plate is made of a metal that forms an insulating oxide layer through anodization. The oxide layer acts as the dielectric of the capacitor. A solid, liquid, or gel electrolyte covers the surface of the oxides layer, serving as the cathode or negative plate of the capacitor. Electrolytic capacitors have a much higher capacitance-voltage product per unit volume than ceramic capacitors or film capacitors, and so can have large capacitance values.
+
+Electrolytic capacitors are polarized components because of their asymmetrical construction and must be operated with a higher potential (i.e. more positive) on the anode than on the cathode at all times. Reverse polarity voltage or voltage exceeding the maximum rated working voltage of as little as 1 to 1.5 volts can damage the dielectric causing catastrophic failure of the capacitor. Failure of electrolytic capacitors can result in an explosion or fire, potentially causing damage to other components as well as injuries.
+
+Polarity is marked on the device housing or the terminal with the shorter leg.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+	     Diodes
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+A diode is a two-terminal electronic component that conducts electric current primarily in one directions (asymmetric conductance). It has low (ideally zero) resistance in one direction and high (ideally infinite) resistance in the other.
+
+Polarity can be viewed by the black band on the cathode side.
+Current flows:   Anode (+) → Cathode (−)
+                 i.e. INTO the banded end
+                 i.e. from the Arduino pin THROUGH the diode TO the capacitor node
+
+A diode's behavior is often simplified as having a forward threshold voltage or "turn-on" voltage or cut-in voltage, above which there is significant current and below which there is almost no current. Depends on a diode's composition:
+
+silicon Schottky: 	0.15V to 0.45V
+Germanium p-n:          0.25V to 0.30V
+Silicon p-n:            0.60V to 0.70V
+Infrared p-n:          ~1.2V
+Light-emitting diodes:  1.6V (red) to 4V (violet)
+
+This voltage may be loosely be referred to as the diode's forward voltage drop or just voltage drop.
+
+The 1N4148 signal diode is a standard silicon switching signal diode. This diode is useful in switching applications up to about 100MHz with a reverse-recovery time of no more than 4 ns.
+
+A Diode in an RC circuit primarily controls the direction of current flow. This ensures that the capacitor can discharge quickly when the power supply is turned off, which is crucial for resetting the circuit. The rapid discharge helps prevent potential damage to other components from voltage spikes that may occur when the power is removed.
+
+The diode's forward drop Vf sets the lowest voltage (discharge floor) the capacitor can reach when discharging through the diode. The capacitor cannot discharge below the diode's forward drop relative to the diode's reference node.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+      Arduino Digital Output
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+The digital output refers to the ability of an Arduino pin to send a signal that can be either HIGH (on) or LOW (off). HIGH out puts approximately 5V, while LOW outputs 0V. Be cautious not to exceed the maximum current of 40mA per pin to avoid damaging the Arduino.
+
+For the RC Circuit project, the trigger pin is driving the input based on coded logic, so a relay is not needed.
+
+    ─────── ⋆⋅☆⋅⋆ ────────
+          Sampling rate
+    ─────── ⋆⋅☆⋅⋆ ────────
+
+Sampling rate matter for fast τ values because a slow sampling rate cannot adequately capture a fast moving system. Failing can produce aliasing and corrupted signals.
+
+Nyquist theorem suggests, to perfectly reconstruct a bandlimited continuous signal from its samples, sample at a rate greater than twice the highest frequency.
+
+For a RC circuit with the time constant τ:
+	The dominant frequency content is roughly related to the cutoff frequency f_c = 1 / (2πRC) = 1 / (2πτ)
+	Nyquist therefore requires f_s = 2 * f_c = 1 / (πRC) = 1 / (πτ) or 0.318 / τ.
+
+In practice, to capture an RC transient accurately (shape, amplitude, time constant estimation), many samples per τ are needed. Typical guidance: sample at 5-20 samples per τ (f_s = 5/τ to 20/τ), much higher than the Nyquist minimum for the circuit's bandwidth.
+
+Example: 1 kΩ resistor and 10 µF capacitor have a Time Constant (τ) of 0.01 seconds or 10ms. Sample guidance dictates a minimum rate of 2ms.
+
+An arduino mega's fastest sampling rate of ~100µs or ~0.1ms should be more than enough
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

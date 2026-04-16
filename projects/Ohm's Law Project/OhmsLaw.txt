@@ -1,0 +1,224 @@
+────── ⋆⋅☆⋅⋆ ────────
+-------Ohm's Law--------
+────── ⋆⋅☆⋅⋆ ────────
+
+Ohm's law states that the electric current through
+a conductor between two points is directly proportional
+to the voltage across the two points.
+
+V = IR; I = V/R; R = V/I
+
+Where I is the current (Amps) through the conductor, V is the
+voltage (Volts) measured *across* the conductor and R is the
+resistance (Ohms) of the conductor.
+
+If the resistance is not constant, the equation cannot
+be called Ohm's law. Materials that do not obey Ohm's law
+are called non-ohmic. Examples of non-constant resistance
+include diodes and filament lamps. Resistance can
+change based on factors like temperature, voltage,
+and current levels
+
+────── ⋆⋅☆⋅⋆ ────────
+----Power Dissipation----
+────── ⋆⋅☆⋅⋆ ────────
+
+Power dissipation refers to the process where electrical
+energy is converted into hear within an electronic
+component or circuit. This phenomenon occurs due to the
+resistance encountered by the electric current as it flows
+through materials, leading to energy loss that manifests
+as heat.
+
+===Types of Power Dissipation===
+
++ Dynamic Power Dissipation
+  - Occurs during circuit operation when the circuit is active
+  - Primarily caused by the charging and discharging of capacitors
+within the circuit
+  - Proportional to the square of the voltage and the frequency
+of the operation
+
++ Static Power Dissipation
+  - Happens when the circuit is not actively switching but
+still consumes power.
+  - Mainly due to leakage currents in transistors when they
+are in an off state.
+
+P = IV; P = I²R; P = V²/R
+
+Where current I flows through a given element, losing voltage
+V in the process. The power dissipated is P (Watts).
+
+=== Resistor Power Ratings ===
+
+Resistors have power ratings to indicate the maximum amount of
+electrical power they can safely dissipate as heat without
+being damages.
+
++ Prevents Overheating
+  - Resistors convert electrical energy in to heat when 
+current flows through them. If the power dissipated exceeds
+the resistor's rating, it can overheat, leading to failure
+or changes in resistance.
+
++ Ensuring Reliability
+  - Proper pwer ratings help maintain the reliability of 
+electronic circuits. Using a resistor with an appropriate power
+rating prevents circuit failure and safety hazards.
+ 
++ Design Considerations
+  - Engineers must consider the power rating when designing
+circuits to ensure components operate within safe limits.
+Selecting resistors with higher power ratings than required 
+provides a safety margin.
+
+────── ⋆⋅☆⋅⋆ ────────
+-----Voltage Divider-----
+────── ⋆⋅☆⋅⋆ ────────
+
+A voltage divider is a passive linear circuit that produces 
+an output voltage (V_out) that is a fraction of its input
+voltage (V_in). Voltage division is the result of *distributing*
+the input voltage among the components of the divider. A
+simple example of a voltage divider is two resistors connected
+in series, with the input voltage applied across the resistor pair
+and the output voltage emerging from the connection between them.
+
+A voltage divider referenced to ground is created by connecting
+two electrical impedances (resistors in this case) in series. 
+The input voltage is applied across the series impedances R1 and R2 
+and the output is the voltage across R2. (Impedances can be 
+composed of other elements such as inductors and capacitors).
+
+Vin		If the current in the output is zero the the
++		relationship between the input voltage, V_in
+|		and the output voltage, V_out is:
+R1		
+|		V_out = V_in * (R2 / (R1 + R2))
++---- Vout
+|		Voltage is distributed proportionally to 
+R2		components. If R1 = R2, then
+|		V_out = 1/2 * Vin.
+-
+GND		Any ratio V_out / V_in greater than 1 is not 
+		possible. Using resistors alone, it is not
+possible to either invert the voltage or increase V_out above V_in.
+
+Solving for an unknown resistor is done using algebra:
+
+R1 = R2 * (V_in / V_out - 1)
+
+R2 = R1 * (1 / (V_in / V_out - 1))
+
+────── ⋆⋅☆⋅⋆ ────────
+------Potentiometer------
+────── ⋆⋅☆⋅⋆ ────────
+
+A potentiometer is a three-terminal resistor with a sliding
+or rotating contact that forms an adjustable voltage divider.
+In motion control systems, potentiometers are frequently used
+as position sensors to provide analog feedback to a controller,
+allowing for precise tracking of mechanical movement
+
+End A      Resistive track        End B
+o-----[======================]-----o
+\              ^
+\              |
+\              | Wiper (middle terminal)
+\              |
+o--------------┘
+
+Potentiometers are essentially voltage dividers. Common uses
+are electronic control devices such as volume controls or 
+speed controls in fans. Potentiometers are rarely used to
+directly control significant power (more than 1 watt), since
+power dissipated in the potentiometer would be comparable to
+the power in the controlled load.
+
+Using only two terminals (one end and the wiper), makes the
+pot act as a variable resistor or rheostat.
+
+────── ⋆⋅☆⋅⋆ ────────
+--Resistor Color Codes--
+────── ⋆⋅☆⋅⋆ ────────
+
+The value of resistance offered by a resistor is marked using
+a color code. Small printing of tiny elements is not feasible.
+Thus, the value of the resistor is displayed using color bands. 
+
+|   |   |   |	   |   |   |   |   |
+B1  B2  M   T  or  B1  B2  B3  M   T
+│   │  │   │      |   |   |   |   |
+
+B1, B2, B3 are digits
+M is the multiplier (10^n)
+T gives the tolerance
+
+The tolerance band (gold/silver) is always on the right.
+
+Colour    Digit    Multiplier
+Black       0        ×1
+Brown       1        ×10
+Red         2        ×100
+Orange      3        ×1,000
+Yellow      4        ×10,000
+Green       5        ×100,000
+Blue        6        ×1,000,000
+Violet      7        ×10,000,000
+Grey        8        —
+White       9        —
+Gold        —        ×0.1       (tolerance ±5%)
+Silver      —        ×0.01      (tolerance ±10%)
+
+────── ⋆⋅☆⋅⋆ ────────
+------Arduino ADC--------
+────── ⋆⋅☆⋅⋆ ────────
+
+Arduino boards use Analog-to-Digital Converters (ADCs) to
+convert signals from sensors into digital values that can
+be processed by the microcontroller. This is essential for
+applications where sensors output analog signals, such as
+temperature or pressure readings.
+
+The Arduino Mega has a resolution of 10 bits or 1024 
+distinct values (0-1023).
+
+To convert the ADC reading to a corresponding voltage, the 
+conversion formula is used:
+
+V_out = (D_out * V_max) / D_max
+
+Where V_out = output voltage
+      D_out = raw ADC digital reading
+      V_max = Maximum measurable input voltage (5V for the Mega)
+      D_max = Maximum ADC raw digital reading (1023 for 10-bits)
+
+ex: For a ADC reading of 512,
+    V_out = (512 * 5) / 1023 = ~2.5V
+
+=== Sampling Rate ===
+
+When the sampling rate is increased, the ADC can capture
+more data points over time. This allows for a more accurate
+representation of fast-changing signals, which can
+enhance the effective resolution. Conversely, if the sampling
+rate is too low, it may not adequately capture the nuances
+of a rapidly changing signal, leading to potential data loss
+or aliasing.
+
+According to the Nyquist theorem, the sampling rate must be
+at least twice the highest frequency of the input signal to
+avoid aliasing.
+
+
+
+
+
+
+
+
+
+
+
+
