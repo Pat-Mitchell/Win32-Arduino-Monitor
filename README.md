@@ -51,6 +51,13 @@ Triggers charge and discharge cycles, plots the exponential voltage curve live, 
 **Hardware:** 10kΩ resistor, 100µF electrolytic capacitor, 1N4148 diode  
 **Win32:** GDI plot panel, CSV export via GetSaveFileName
 
+### Project 03: PWM LED Dimmer with Frequency Display
+Controls the brightness of an LED from Win32 app, plots the average voltage measured at the low-pass filter at a stable duty cycle and the settling voltage from a sudden increase in duty cycle.
+
+**Theory:** PWM duty cycles, converting the raw digital signal to a smooth average using a low-pass filter, observing the effects of changing the τ = RC value of the low-pass filter (faster/slower response; larger/smaller ripples).
+**Hardware:** 220Ω, 1kΩ, 4.7kΩ, 5.6kΩ, 10kΩ, 1MΩ resistors; 10µF, 4.7µF electrolytic capacitors; Red LED.
+**WIN32:** Trackbar, Live numeric readouts, GDI plot panel, CSV export via GetSaveFileName
+
 ---
 
 ## Build
@@ -75,7 +82,6 @@ The `/lessons` folder contains the raw Win32 code written before the wrapper exi
 
 ## Planned Projects
 
-- PWM LED Dimmer with Frequency Display
 - Wheatstone Bridge Strain Gauge
 - LRC Resonance Detector
 - H-Bridge DC Motor Controller
