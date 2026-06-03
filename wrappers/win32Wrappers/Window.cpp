@@ -86,6 +86,10 @@ LRESULT Window::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
       OnDestroy();
       PostQuitMessage(0);
       return 0;
+
+    case WM_HSCROLL:
+      OnScroll((HWND)lParam, (int)LOWORD(wParam));
+      return 0;
   }
 
   return DefWindowProc(hwnd_self, uMsg, wParam, lParam);

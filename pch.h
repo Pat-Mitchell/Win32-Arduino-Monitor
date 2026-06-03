@@ -4,7 +4,7 @@
 
 #pragma once
 
-// Windows API — by far the heaviest include in this project
+// Windows API - by far the heaviest include in this project
 #include <windows.h>
 
 // C standard headers used across the project

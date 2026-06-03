@@ -72,6 +72,12 @@ class Window : public UIElement {
     /// @return Result passed back to the OS
     virtual LRESULT OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+    /// @function OnScroll
+    /// @brief Called when WM_HSCROLL fires (trackbar or scrollbar moved).
+    /// @param hwnd_control Handle to the control that fired
+    /// @param iCode Scroll code (TB_THUMBTRACK, TB_ENDTRACK, etc.)
+    virtual void OnScroll(HWND hwnd_control, int iCode) {}
+
     HINSTANCE hinstance_app;
   
   private:

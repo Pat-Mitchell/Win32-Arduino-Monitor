@@ -1,0 +1,33 @@
+4.7K + 10K ohm resistors
+15.06 C
+Measures: 14621 ohm
+4.7K = 4.675K
+10K = 10.01K
+
+2.2K + 10K ohm resistors
+19.1 C
+Measures: 12118 ohm
+2.2K = 2.178K
+10K = 10.01K
+
+10K ohm resistor
+23.45 C
+Measures: 9960 ohm
+10K = 10.01K
+
+5.6K + 2.2K ohm resistors
+29.52 C
+Measures: 7683 ohm
+2.2K = 2178 ohm
+5.6K = 5528 ohm
+
+5.6K + 1K ohm resistors
+33.5 C
+Measures: 6460 ohm
+5.6K = 5528 ohm
+1K = 978 ohm
+
+5.6K ohm Resistor
+37.5 C
+Measures: 5489 ohm
+5.6K = 5528 ohm
