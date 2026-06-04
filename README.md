@@ -58,6 +58,18 @@ Controls the brightness of an LED from Win32 app, plots the average voltage meas
 **Hardware:** 220Ω, 1kΩ, 4.7kΩ, 5.6kΩ, 10kΩ, 1MΩ resistors; 10µF, 4.7µF electrolytic capacitors; Red LED.
 **WIN32:** Trackbar, Live numeric readouts, GDI plot panel, CSV export via GetSaveFileName
 
+### Project 04: Wheatstone Bridge with NTC Thermistor
+Measures the change in resistance of a 10kΩ NTC Thermistor. Measured resistance is converted into a temperature reading with a line plot showing the change over time. Includes a stage where the Arduino voltage is calibrated to improve the accuracy of readings.
+**Theory:** Wheatstone bridges. What happens in a theoretical balanced bridge and what occurs when it is unbalanced. Converting raw digital signal to a temperature reading using the beta formula.
+**Hardware:** 10kΩ resistors, 10kΩ ntc thermistor
+**Win32:** Live numeric readouts, GDI plot panel, CSV export
+
+### Project 05: AC Phasor Power Triangle
+Display the theoretical result of $V_{rms}$, frequency, capacitance, inductance, and resistance in an RC circuit and display the result with numeric readouts and a graphical display of the resulting phasor diagram and power triangle.
+**Theory:** Understanding what AC current is. $V_{RMS}$ is used instead of $V_{peak}$ to describe the equivalent voltage in a DC circuit. Reactance and its relation to resistance in a DC circuit. The effects of capacitors and inductors making a circuit more capacitive/inductive, shifting the phase of the voltage/current, and how engineers aim for resonance to maximize the power factor.
+**Hardware:** None. This project was based in theory.
+**Win32:** Live numeric readouts that update live with changes in inputs. Two GDI panels that display the resulting phasor diagram and power triangle of the user's inputs.
+
 ---
 
 ## Build
@@ -82,7 +94,6 @@ The `/lessons` folder contains the raw Win32 code written before the wrapper exi
 
 ## Planned Projects
 
-- Wheatstone Bridge Strain Gauge
 - LRC Resonance Detector
 - H-Bridge DC Motor Controller
 - Op-Amp Signal Amplifier / Oscilloscope
