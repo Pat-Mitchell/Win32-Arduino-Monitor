@@ -1,4 +1,15 @@
+#pragma once
+
 #include "FreqPlotPanel.h"
+#include <cwchar>
+
+namespace {
+  const COLORREF kCurve = RGB(80, 180, 255);
+  const COLORREF kPeak = RGB(255, 160, 40);
+  const COLORREF kRefLine = RGB(60, 140, 60);
+  const COLORREF kAxis = RGB(100, 100, 100);
+  const COLORREF kText = RGB(140, 140, 140);
+}
 
 void FreqPlotPanel::Init(int iX, int iY, int iW, int iH) {
   rect_bounds = {iX, iY, iX + iW, iY + iH};
@@ -98,9 +109,9 @@ void FreqPlotPanel::Draw(HDC hdc, float fVpin) const {
   if(iCount > 0) {
     SetTextColor(hdc, kText);
 
-    wsprintf(arrBuf, L"%.0fk", arrFreq[0] / 1000.0f);
+    swprintf(arrBuf, L"%.0fk", arrFreq[0] / 1000.0f);
     TextOut(hdc, iL + iPadL, iB - iPadB + 8, arrBuf, lstrlen(arrBuf));
-    wsprintf(arrBuf, L"%.0fk", arrFreq[iCount - 1] / 1000.0f);
+    swprintf(arrBuf, L"%.0fk", arrFreq[iCount - 1] / 1000.0f);
     TextOut(hdc, iR - iPadR - 28, iB - iPadB + 8, arrBuf, lstrlen(arrBuf));
 
     // Hz unit label centered under X axis
@@ -110,13 +121,14 @@ void FreqPlotPanel::Draw(HDC hdc, float fVpin) const {
   // Resonant peak marker. Dashed vertical amber line
   if(iCount > 1) {
     HPEN hpen_peak = CreatePen(PS_DASH, 1, kPeak);
+    SelectObject(hdc, hpen_peak);
     int iXpeak = MapXByIdx(iPeakIdx);
     MoveToEx(hdc, iXpeak, iT + iPadT, NULL);
     LineTo(hdc, iXpeak, iB - iPadB);
     DeleteObject(hpen_peak);
 
     SetTextColor(hdc, kPeak);
-    wsprintf(arrBuf, L"%.1fk", arrFreq[iPeakIdx] / 1000.0f);
+    swprintf(arrBuf, L"%.1fk", arrFreq[iPeakIdx] / 1000.0f);
     TextOut(hdc, iXpeak + 3, iT + iPadT + 4, arrBuf, lstrlen(arrBuf));
   }
 

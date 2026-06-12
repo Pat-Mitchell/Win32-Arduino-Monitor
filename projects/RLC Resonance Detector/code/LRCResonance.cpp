@@ -143,7 +143,7 @@ void LRCWindow::OnCreate() {
   // Frequency response plot
   plot.Init(16, 248, 608, 300);
 
-  // Calculate and display theoretical f_0, from default L/C values
+  // Calculate and display theoretical f0, from default L/C values
   UpdateTheoreticalF0();
 }
 
@@ -266,4 +266,230 @@ void LRCWindow::OnTimer(int iTimerId) {
 void LRCWindow::OnDestroy() {
   KillTimer(hwnd_self, ID_TIMER_POLL);
   port.Close();
+}
+
+// ────── ⋆⋅☆⋅⋆ ────────
+// ParseLine
+// ────── ⋆⋅☆⋅⋆ ────────
+// Message types:
+//   "FREQ:x,VPEAK:y"  <-Sweep data point
+//   "SWEEP:DONE"      <-Sweep complete
+//   "SWEEP:STOPPED"   <-Sweep aborted
+//   "VCC:x"           <-Supply voltage reading
+//   "VPIN:x"          <-Pin voltage reading
+// ────── ⋆⋅☆⋅⋆ ────────
+
+/// @brief Routes one incoming serial line to the appropriate handler.
+/// @param szLine Wide string for one complete line
+/// @return TRUE if a repaint is needed
+bool LRCWindow::ParseLine(const wchar_t* szLine) {
+  // Sweep data point
+  if(wcsstr(szLine, L"FREQ:") && wcsstr(szLine, L"VPEAK:")) {
+    float fFreq = ParseFloat(szLine, L"FREQ:");
+    float fVpeak = ParseFloat(szLine, L"VPEAK:");
+
+    if(fFreq > 0 && fVpeak >=0) {
+      plot.AddSample(fFreq, fVpeak);
+      iReceivedSteps++;
+
+      // Update progress bar
+      if(iExpectedSteps > 0)
+        prog_sweep->SetPos((iReceivedSteps * 100) / iExpectedSteps);
+
+      // Update status periodically
+      if(iReceivedSteps % 10 == 0) {
+        wchar_t arrBuf[48];
+        wsprintf(arrBuf, L"Sweeping... %d / %d steps", iReceivedSteps, iExpectedSteps);
+        lbl_status->SetText(arrBuf);
+      }
+    }
+    return true;
+  }
+
+  // Sweep complete
+  if(wcsstr(szLine, L"SWEEP:DONE") || wcsstr(szLine, L"SWEEP:STOPPED")) {
+    bSweepActive = false;
+
+    btn_sweep->Enable();
+    btn_stop->Disable();
+    btn_setvpin->Enable();
+    btn_export->Enable();
+
+    bool bDone = (wcsstr(szLine, L"DONE") != nullptr);
+    lbl_status->SetText(bDone ? L"Sweep complete." : L"Sweep stopped.");
+
+    prog_sweep->SetPos(bDone ? 100 : prog_sweep->GetHandle() ? (int)SendMessage(prog_sweep->GetHandle(), PBM_GETPOS, 0, 0) : 0);
+
+    // Update f0 measured label from plot peak
+    float fF0 = plot.GetPeakFreq();
+    if(fF0 > 0) {
+      wchar_t arrBuf[32];
+      wsprintf(arrBuf, L"%.1f Hz", fF0);
+      lbl_f0_meas->SetText(arrBuf);
+      UpdateError(fF0);
+    }
+    return true;
+  }
+
+  // VCC reading
+  if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"VPEAL:")) {
+    float fVcc = ParseFloat(szLine, L"VCC:");
+    if(fVcc > 0) {
+      wchar_t arrBuf[32];
+      int iW = (int)fVcc;
+      int iF = (int)((fVcc - iW) * 1000);
+      wsprintf(arrBuf, L"VCC: %d.%03d V", iW, iF);
+      lbl_vcc->SetText(arrBuf);
+    }
+    return false;
+  }
+
+  return false;
+}
+
+// ────── ⋆⋅☆⋅⋆ ────────
+// Helpers
+// ────── ⋆⋅☆⋅⋆ ────────
+
+/// @brief Reads sweep parameters from UI, validates them, clears the plot,
+///   resets the progrss bar, and sends the SWEEP command
+void LRCWindow::StartSweep() {
+  wchar_t arrBuf[32];
+
+  edit_fstart->GetText(arrBuf, 32);
+  long lStart = wcstol(arrBuf, nullptr, 10);
+
+  edit_fend->GetText(arrBuf, 32);
+  long lEnd = wcstol(arrBuf, nullptr, 10);
+
+  edit_steps->GetText(arrBuf, 32);
+  int iSteps = (int)wcstol(arrBuf, nullptr, 10);
+
+  if(lStart <- 0 || lEnd <= lStart || iSteps < 2 || iSteps > 500){
+    MessageBox(hwnd_self,
+               L"Invalid sweep parameters.\n\n"
+               L"f start must be > 0\n"
+               L"f end must be > f start\n"
+               L"Steps must be 2-500",
+              L"Sweep", MB_OK | MB_ICONWARNING);
+    return;
+  }
+
+  // Build and send command: "SWEEP:lStart,lEnd,iSteps"
+  char arrCmd[48];
+  wsprintfA(arrCmd, "SWEEP:%ld,%ld,%d", lStart, lEnd, iSteps);
+  port.Write(arrCmd);
+
+  // Reset state
+  plot.Clear();
+  iExpectedSteps = iSteps;
+  iReceivedSteps = 0;
+  bSweepActive = true;
+
+  prog_sweep->SetRange(0, 100);
+  prog_sweep->SetPos(0);
+
+  lbl_f0_meas->SetText(L"---");
+  lbl_error->SetText(L"---");
+  lbl_status->SetText(L"Starting sweep...");
+
+  btn_sweep->Disable();
+  btn_stop->Enable();
+  btn_setvpin->Disable();
+  btn_export->Disable();
+
+  UpdateTheoreticalF0();
+}
+
+/// @brief Reads L and C from TextInput fields and calculates f0
+///   Updates lbl_f0_theory. Called at startup and before each sweep
+void LRCWindow::UpdateTheoreticalF0() {
+  wchar_t arrBuf[32];
+
+  edit_lval->GetText(arrBuf, 32);
+  float fL_uH = wcstof(arrBuf, nullptr);
+
+  edit_cval->GetText(arrBuf, 32);
+  float fC_nF = wcstof(arrBuf, nullptr);
+
+  if(fL_uH <= 0 || fC_nF <= 0) {
+    lbl_f0_theory->SetText(L"---");
+    return;
+  }
+
+  float fL_H = fL_uH * 1e-6f;
+  float fC_F = fC_nF * 1e-9f;
+
+  float fF0_theory = 1.0f / (2.0f * 3.14159265f * sqrtf(fL_H * fC_F));
+
+  wsprintf(arrBuf, L"%.1f Hz", fF0_theory);
+  lbl_f0_theory->SetText(arrBuf);
+}
+
+void LRCWindow::UpdateError(float fF0_measured) {
+  wchar_t arrBuf[32];
+  edit_lval->GetText(arrBuf, 32);
+  float fL_uH = wcstof(arrBuf, nullptr);
+  edit_cval->GetText(arrBuf, 32);
+  float fC_nF = wcstof(arrBuf, nullptr);
+
+  if(fL_uH <= 0 || fC_nF <= 0) return;
+
+  float fL_H = fL_uH * 1e-6f;
+  float fC_F = fC_nF * 1e-9f;
+  float fF0_theory = 1.0f / (2.0f * 3.14159265f * sqrtf(fL_H * fC_F));
+  float fErr_pct = fabsf(fF0_measured - fF0_theory) / fF0_theory * 100.0f;
+
+  int iW = (int)fErr_pct;
+  int iF = (int)((fErr_pct - iW) * 10);
+  wsprintf(arrBuf, L"%d.%d%%", iW, iF);
+  lbl_error->SetText(arrBuf);
+}
+
+// ────── ⋆⋅☆⋅⋆ ────────
+// OnConnect / OnDisconnect
+// ────── ⋆⋅☆⋅⋆ ────────
+void LRCWindow::OnConnect() {
+  if(cmb_port->GetCount() == 0) {
+    MessageBox(hwnd_self, L"No COM ports found.", L"Connect", MB_OK | MB_ICONWARNING);
+    return;
+  }
+
+  wchar_t arrPortName[16];
+  cmb_port->GetSelected(arrPortName, 16);
+
+  if(!port.Open(arrPortName)) {
+    wchar_t arrMsg[64];
+    wsprintf(arrMsg, L"Failed to open %s.\nError: %lu", arrPortName, port.GetLastErrorCode());
+    MessageBox(hwnd_self, arrMsg, L"Connect", MB_OK | MB_ICONERROR);
+    return;
+  }
+
+  SetTimer(hwnd_self, ID_TIMER_POLL, POLL_MS, NULL);
+
+  btn_connect->Disable();
+  btn_disc->Enable();
+  btn_sweep->Enable();
+  btn_setvpin->Enable();
+  cmb_port->Disable();
+
+  lbl_status->SetText(L"CONNECTED. Configure sweep and click Start.");
+}
+
+void LRCWindow::OnDisconnect() {
+  KillTimer(hwnd_self, ID_TIMER_POLL);
+  port.Close();
+  bSweepActive = false;
+
+  btn_connect->Enable();
+  btn_disc->Disable();
+  btn_sweep->Disable();
+  btn_stop->Disable();
+  btn_setvpin->Disable();
+  cmb_port->Enable();
+
+  lbl_status->SetText(L"Disconnected.");
+  lbl_vcc->SetText(L"VCC: ---");
+
+  ScanComPorts(cmb_port);
 }
