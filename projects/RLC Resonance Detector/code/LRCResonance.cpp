@@ -9,7 +9,7 @@ BOOL ExportCSV(const wchar_t* szPath, const float* arrFreq, const float* arrV, i
   if(hFile == INVALID_HANDLE_VALUE) return FALSE;
 
   DWORD dw = 0;
-  const char* szHdr = "Frequency_Hz,VOltage_V\r\n";
+  const char* szHdr = "Frequency_Hz,Voltage_V\r\n";
   WriteFile(hFile, szHdr, lstrlenA(szHdr), &dw, NULL);
 
   for(int i = 0; i < iCount; i++) {
@@ -184,7 +184,7 @@ void LRCWindow::OnCommand(int iControlId, int NotifCode) {
       char arrCmd[24];
       int iW = (int)fVpin;
       int iF = (int)((fVpin - iW) * 1000);
-      wsprintfA(arrCmd, "STEPINV:%d.%03d", iW, iF);
+      wsprintfA(arrCmd, "SETPINV:%d.%03d", iW, iF);
       port.Write(arrCmd);
 
       InvalidateRect(hwnd_self, NULL, FALSE);
@@ -233,11 +233,11 @@ void LRCWindow::OnTimer(int iTimerId) {
   char* pEnd = nullptr;
   bool bRepaint = false;
 
-  while ((pEnd = strchr(pLine, '\n')) != nullptr) {
+  while((pEnd = strchr(pLine, '\n')) != nullptr) {
     *pEnd = '\0';
     int iLen = (int)strlen(pLine);
     if(iLen > 0 && pLine[iLen - 1] == '\r') {
-      pLine[iLen -1];
+      pLine[iLen - 1] = '\0';
     }
 
     wchar_t arrWide[READ_BUF];
@@ -246,9 +246,10 @@ void LRCWindow::OnTimer(int iTimerId) {
     if(ParseLine(arrWide)) {
       bRepaint = true;
     }
+    pLine = pEnd + 1;
   }
 
-  int iRemaining = iLineBufLen = (int)(pLine - arrLineBuf);
+  int iRemaining = iLineBufLen - (int)(pLine - arrLineBuf);
   if(iRemaining > 0) {
     memmove(arrLineBuf, pLine, iRemaining);
   }
@@ -324,7 +325,7 @@ bool LRCWindow::ParseLine(const wchar_t* szLine) {
     float fF0 = plot.GetPeakFreq();
     if(fF0 > 0) {
       wchar_t arrBuf[32];
-      wsprintf(arrBuf, L"%.1f Hz", fF0);
+      swprintf(arrBuf, L"%.1f Hz", fF0);
       lbl_f0_meas->SetText(arrBuf);
       UpdateError(fF0);
     }
@@ -332,7 +333,7 @@ bool LRCWindow::ParseLine(const wchar_t* szLine) {
   }
 
   // VCC reading
-  if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"VPEAL:")) {
+  if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"VPEAK:")) {
     float fVcc = ParseFloat(szLine, L"VCC:");
     if(fVcc > 0) {
       wchar_t arrBuf[32];
@@ -340,6 +341,20 @@ bool LRCWindow::ParseLine(const wchar_t* szLine) {
       int iF = (int)((fVcc - iW) * 1000);
       wsprintf(arrBuf, L"VCC: %d.%03d V", iW, iF);
       lbl_vcc->SetText(arrBuf);
+    }
+    return false;
+  }
+
+  // V_pin reading
+  if(wcsstr(szLine, L"VPIN:")) {
+    float fV = ParseFloat(szLine, L"VPIN:");
+    if(fV > 0) {
+      fVpin = fV;
+      wchar_t arrBuf[16];
+      int iW = (int)fV;
+      int iF = (int)((fV - iW) * 1000);
+      wsprintf(arrBuf, L"%d.%03d", iW, iF);
+      edit_vpin->SetText(arrBuf);
     }
     return false;
   }
@@ -365,7 +380,7 @@ void LRCWindow::StartSweep() {
   edit_steps->GetText(arrBuf, 32);
   int iSteps = (int)wcstol(arrBuf, nullptr, 10);
 
-  if(lStart <- 0 || lEnd <= lStart || iSteps < 2 || iSteps > 500){
+  if(lStart <= 0 || lEnd <= lStart || iSteps < 2 || iSteps > 500){
     MessageBox(hwnd_self,
                L"Invalid sweep parameters.\n\n"
                L"f start must be > 0\n"
@@ -422,7 +437,7 @@ void LRCWindow::UpdateTheoreticalF0() {
 
   float fF0_theory = 1.0f / (2.0f * 3.14159265f * sqrtf(fL_H * fC_F));
 
-  wsprintf(arrBuf, L"%.1f Hz", fF0_theory);
+  swprintf(arrBuf, L"%.1f Hz", fF0_theory);
   lbl_f0_theory->SetText(arrBuf);
 }
 

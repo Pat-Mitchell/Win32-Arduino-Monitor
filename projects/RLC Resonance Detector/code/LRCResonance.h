@@ -2,6 +2,7 @@
 /// @brief LRC Resonance Detector
 ///   Sends sweep commands to Arduino, plots frequency response,
 ///   detects resonant peak, and compares against theoretical f_0.
+#pragma once
 
 #include "FreqPlotPanel.h"
 #include "../../../pch.h"
@@ -16,7 +17,8 @@
 
 #include <CommCtrl.h>
 #include <math.h>
-#pragma comment(lib, "comct132.lib")
+#include <cwchar>
+#pragma comment(lib, "comctl32.lib")
 
 // ────── ⋆⋅☆⋅⋆ ────────
 // Control IDs
@@ -40,7 +42,6 @@
 
 #define POLL_MS     50
 #define READ_BUF    512
-#define MAX_SAMPLES 512
 
 // ────── ⋆⋅☆⋅⋆ ────────
 // LRCWindow
