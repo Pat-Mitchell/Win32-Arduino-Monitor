@@ -15,7 +15,7 @@
 #include "../../../wrappers/win32Wrappers/ProgressBar.h"
 #include "../../../wrappers/serialPortWrappers/SerialPort.h"
 
-#include <CommCtrl.h>
+#include <commctrl.h>
 #include <math.h>
 #include <cwchar>
 #pragma comment(lib, "comctl32.lib")

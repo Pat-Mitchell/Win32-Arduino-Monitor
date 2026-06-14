@@ -1,7 +1,7 @@
 /// @file lrc_resonance.ino
 /// @brief LRC Resonance Detector.
 ///   Sweeps PWM frequency using Timer 1 phase-correct mode on pin 11
-///   Measures peak voltage across R_sense ar each step and streams
+///   Measures peak voltage across R_sense at each step and streams
 ///   data to the Win32 app. 
 
 float fV_ref = 5.0; // Actual VCC. Measured and overwritten at startup
@@ -21,6 +21,11 @@ float measureVCC() {
   ADCSRA |= _BV(ADSC);
   while (bit_is_set(ADCSRA, ADSC));
   long lRaw = ADCL | (ADCH << 8);
+
+  // Restore ADMUX to A0 with VCC reference before returning
+  ADMUX = _BV(REFS0);
+  delay(2);
+
   return 1125300.0 / lRaw / 1000.0;
 }
 
@@ -40,7 +45,7 @@ int doubleRead(int iPin) {
 ///   frequency response curve.
 ///
 ///   Register config:
-///      TCCR1A1 + WGM11
+///      TCCR1A: COM1A1 + WGM11
 ///        COM1A1 = non-inverting (clear on up-count, set on down-count)
 ///        WGM11  = part of mode 10 (phase-correct, ICR1 = TOP)
 ///      TCCR1B: WGM13 + CS10
@@ -54,6 +59,7 @@ void setupTimer1() {
   TCCR1B = _BV(WGM13) | _BV(CS10);
   ICR1 = 160; // Default 50 kHz: 16,000,000 / (2 * 1 * 160) = 50,000 Hz
   OCR1A = 80; // 50% duty: OCR1A = ICR1 / 2
+  pinMode(11, OUTPUT);
 }
 
 /// @brief Sets Timer 1 PWM frequency on pin 11 and maintains 50% duty.
@@ -78,12 +84,12 @@ void setFrequency(long lFreq_Hz) {
 ///   Peak detection is appropriate here because an AC waveform is being measured
 ///   The peak tracks the signal amplitude regardless of where in the cycle
 ///   each smaple lands.
-/// @return Reak voltage in volts. Scaled using measured VCC from measureVCC()
+/// @return Peak voltage in volts. Scaled using measured VCC from measureVCC()
 float measureVPeak() {
   int iPeak = 0;
   for(int i = 0; i < iSamples; i++) {
     int iVal = doubleRead(A0);
-    iVal > iPeak ? iPeak = iVal : iPeak;
+    if(iVal > iPeak) iPeak = iVal;
     delayMicroseconds(8); // Space samples across cycles
   }
   return (iPeak / 1023.0f) * fV_ref;

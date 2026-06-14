@@ -1,6 +1,6 @@
 # Win32 Arduino Monitor
 
-A collection of Windows GUI applications that communicate with an Arduino Mega 2560 over serial, built from scratch using the Win32 API and a hand-rolled C++ OOP wrapper library.
+A collection of Windows GUI applications that communicate with an Arduino Mega 2560 over serial, built from scratch using the Win32 API and a C++ OOP wrapper library.
 
 ---
 
@@ -30,8 +30,6 @@ UIElement       — abstract base (HWND management, SetText, Enable/Disable)
 SerialPort      — Win32 serial I/O (CreateFile, DCB, COMMTIMEOUTS)
 Utils           — ScanComPorts, ParseFloat, ShowSaveDialog
 ```
-
-The `Window` class uses a static WndProc trampoline that stores `this` in `GWLP_USERDATA` via `WM_NCCREATE`, bridging the C-style callback into virtual methods (`OnCreate`, `OnCommand`, `OnTimer`, `OnPaint`, `OnDestroy`).
 
 ---
 
