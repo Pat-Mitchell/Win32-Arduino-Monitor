@@ -145,7 +145,7 @@ void setup() {
   Serial.begin(9600);
   setupTimer1();
 
-  fV_ref = measureVCC();
+  // fV_ref = measureVCC(); // Temporarily removing to see if this is causing junk a0 readings
   fV_pin = fV_ref * 0.97f; // GPIO HIGH typically 97% of VCC. Verify with multimeter or stick with 97%
 
   Serial.print("VCC:");
@@ -197,8 +197,8 @@ void loop() {
 
   // MEASURE_VCC -> re-measure supply
   if(strCmd == "MEASURE_VCC") {
-    fV_ref = measureVCC();
-    fV_pin = fV_ref * 0.97f; // Typically 97%. Check with multimeter
+    // fV_ref = measureVCC(); // Temporarily removing to see if this is the the cause of junk a0 readings
+    // fV_pin = fV_ref * 0.97f; // Typically 97%. Check with multimeter
     Serial.print("VCC:");
     Serial.println(fV_ref, 3);
     return;

@@ -1,6 +1,5 @@
 #include "FreqPlotPanel.h"
 #include <cwchar>
-#include <commctrl.h>
 
 namespace {
   const COLORREF kCurve = RGB(80, 180, 255);
