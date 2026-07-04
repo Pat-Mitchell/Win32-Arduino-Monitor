@@ -1,0 +1,75 @@
+<svg width="680" viewBox="0 0 680 470" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Project 05 — LRC Resonance Detector Wiring Diagram</title>
+<desc>Series LRC circuit: PWM pin 11 drives L, C, R_sense in series to GND. A0 measures voltage across R_sense — peaks at resonant frequency.</desc>
+
+<rect width="680" height="470" fill="#ffffff"/>
+
+<!-- Background rectangle -->
+<rect width="100%" height="100%" style="fill:rgb(54, 54, 54)" />
+
+<!-- GND rail -->
+<line x1="180" y1="420" x2="500" y2="420" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="288" y1="424" x2="312" y2="424" stroke="#444444" stroke-width="1.5"/>
+<line x1="293" y1="430" x2="307" y2="430" stroke="#444444" stroke-width="1.5"/>
+<line x1="297" y1="436" x2="303" y2="436" stroke="#444444" stroke-width="1.5"/>
+<text font-family="sans-serif" font-size="12" fill="#444444" text-anchor="middle" x="300" y="452">GND</text>
+<circle cx="180" cy="420" r="3.5" fill="rgb(250, 249, 245)"/>
+
+<!-- Arduino block -->
+<rect x="500" y="50" width="140" height="340" rx="8" fill="rgb(12, 68, 124)" stroke="#185fa5" stroke-width="1"/>
+<text font-family="sans-serif" font-size="14" font-weight="500" fill="rgb(181, 212, 244)" text-anchor="middle" x="570" y="76">Arduino Mega</text>
+<text font-family="sans-serif" font-size="12" fill="#185fa5" x="512" y="154">PWM ~11</text>
+<text font-family="sans-serif" font-size="12" fill="#185fa5" x="512" y="254">A0</text>
+<text font-family="sans-serif" font-size="12" fill="#185fa5" x="512" y="369">GND</text>
+<circle cx="500" cy="150" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="500" cy="250" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="500" cy="365" r="3" fill="rgb(250, 249, 245)"/>
+
+<!-- PWM L-bend to inductor right end -->
+<line x1="500" y1="150" x2="500" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+<line x1="500" y1="185" x2="460" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- Inductor: 4-hump coil -->
+<path d="M380 185 A10 10 0 0 0 400 185 A10 10 0 0 0 420 185 A10 10 0 0 0 440 185 A10 10 0 0 0 460 185"
+      fill="none" stroke="rgb(250, 249, 245)" stroke-width="2" stroke-linecap="round"/>
+<text font-family="sans-serif" font-size="12" fill="#333333" text-anchor="middle" x="420" y="160">100µH</text>
+<text font-family="sans-serif" font-size="12" fill="#333333" text-anchor="middle" x="420" y="172">L</text>
+
+<!-- Wire between inductor and capacitor -->
+<line x1="340" y1="185" x2="380" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- Capacitor: two-plate symbol -->
+<line x1="330" y1="185" x2="340" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+<line x1="330" y1="171" x2="330" y2="199" stroke="rgb(250, 249, 245)" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="318" y1="171" x2="318" y2="199" stroke="rgb(250, 249, 245)" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="300" y1="185" x2="318" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+<text font-family="sans-serif" font-size="12" fill="#333333" text-anchor="middle" x="324" y="160">100nF</text>
+<text font-family="sans-serif" font-size="12" fill="#333333" text-anchor="middle" x="324" y="172">C</text>
+
+<!-- Wire from capacitor left to Node A -->
+<line x1="260" y1="185" x2="300" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- Node A junction dot -->
+<circle cx="270" cy="185" r="4.5" fill="rgb(250, 249, 245)"/>
+<text font-family="sans-serif" font-size="12" fill="#aaaaaa" text-anchor="middle" x="290" y="175">Node A</text>
+
+<!-- R_sense resistor -->
+<rect x="180" y="173" width="80" height="24" rx="3" fill="rgb(95, 38, 36)" stroke="#888888" stroke-width="0.75"/>
+<text font-family="sans-serif" font-size="12" fill="#aaaaaa" text-anchor="middle" x="220" y="210">220Ω</text>
+<text font-family="sans-serif" font-size="12" fill="#aaaaaa" text-anchor="middle" x="220" y="225">R_sense</text>
+
+<!-- GND wire from R_sense left end -->
+<line x1="180" y1="185" x2="180" y2="420" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- A0 horizontal then vertical to Node A -->
+<line x1="500" y1="250" x2="270" y2="250" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+<line x1="270" y1="250" x2="270" y2="185" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- Arduino GND wire -->
+<line x1="500" y1="365" x2="500" y2="420" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
+
+<!-- Annotations -->
+<text font-family="sans-serif" font-size="11" fill="#aaaaaa" text-anchor="middle" x="390" y="222">f₀ = 1/(2π√LC) ≈ 50.3 kHz</text>
+<text font-family="sans-serif" font-size="11" fill="#aaaaaa" text-anchor="middle" x="385" y="265">← ADC measures V_R. Peaks at resonance</text>
+
+</svg>

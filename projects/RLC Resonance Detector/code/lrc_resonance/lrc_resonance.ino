@@ -7,7 +7,7 @@
 float fV_ref = 5.0; // Actual VCC. Measured and overwritten at startup
 float fV_pin = 4.85; // Actual PWM pin HIGH voltage. Measure w/ multimeter
 
-const int iSamples = 128; // ADC samples taken per frequency step for peak detection.
+const int iSamples = 400; // ADC samples taken per frequency step for peak detection.
 const int iSettle_ms = 10; // Settle time after each freqncy change in milliseconds.
 
 bool bSweepActive = false;
@@ -17,26 +17,40 @@ bool bSweepStop = false;
 /// @return VCC in volts.
 float measureVCC() {
   ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  delay(5);
+
+  // Force the ADC prescaler to /128 for this measurement. The bandgap needs
+  // the slow ~125 kHz ADC clock to read accurately, even though the sweep
+  // runs the ADC much faster. Restored below before returning.
+  uint8_t prevADCSRA = ADCSRA;
+  ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
+
+  delay(10); // Let the internal 1.1V bandgap reference settle
+
+  // Throwaway conversion: the first read after switching to the bandgap
+  // channel is unreliable while the reference stabilizes.
   ADCSRA |= _BV(ADSC);
   while (bit_is_set(ADCSRA, ADSC));
-  long lRaw = ADCL | (ADCH << 8);
+
+  // Real conversion
+  ADCSRA |= _BV(ADSC);
+  while (bit_is_set(ADCSRA, ADSC));
+
+  // Must read ADCL before ADCH: reading ADCL locks the data register pair
+  // and reading ADCH unlocks it. Doing this in one expression (ADCL | (ADCH
+  // << 8)) leaves evaluation order to the compiler and can read the bytes
+  // out of order -> garbage lRaw -> garbage fV_ref.
+  uint8_t low = ADCL;
+  uint8_t high = ADCH;
+  long lRaw = ((long)high << 8) | low;
+
+  ADCSRA = prevADCSRA; // Restore the sweep's fast ADC prescaler
 
   // Restore ADMUX to A0 with VCC reference before returning
   ADMUX = _BV(REFS0);
   delay(2);
 
+  if(lRaw == 0) return fV_ref; // Guard against divide-by-zero; keep last good value
   return 1125300.0 / lRaw / 1000.0;
-}
-
-/// @brief Reads analog pin twice, discarding the first.
-///   The first read charges the ADC sample-and-hold capacitor from the 
-///   previous channel. The second read is accurate.
-/// @param iPin Analog pin number
-/// @return Settled ADC reading
-int doubleRead(int iPin) {
-  analogRead(iPin);
-  return analogRead(iPin);
 }
 
 /// @brief Configures Timer 1 for phase-correct PWM moe 10 (ICR1 = TOP)
@@ -86,11 +100,17 @@ void setFrequency(long lFreq_Hz) {
 ///   each smaple lands.
 /// @return Peak voltage in volts. Scaled using measured VCC from measureVCC()
 float measureVPeak() {
+  analogRead(A0); // Prime the sample-and-hold; discard this reading.
   int iPeak = 0;
   for(int i = 0; i < iSamples; i++) {
-    int iVal = doubleRead(A0);
+    int iVal = analogRead(A0);
     if(iVal > iPeak) iPeak = iVal;
-    delayMicroseconds(8); // Space samples across cycles
+    // Jitter the inter-sample spacing. With a fixed delay the sample times
+    // could beat into lock with the PWM period, landing every sample on the
+    // same phase and missing the crest -- that produced the dropout points
+    // (e.g. VPEAK 0.0000) in earlier sweeps. Random spacing decorrelates the
+    // sampling from the waveform so the true peak is found reliably.
+    delayMicroseconds(2 + (int)random(0, 16));
   }
   return (iPeak / 1023.0f) * fV_ref;
 }
@@ -145,8 +165,13 @@ void setup() {
   Serial.begin(9600);
   setupTimer1();
 
-  // fV_ref = measureVCC(); // Temporarily removing to see if this is causing junk a0 readings
+  fV_ref = measureVCC();
   fV_pin = fV_ref * 0.97f; // GPIO HIGH typically 97% of VCC. Verify with multimeter or stick with 97%
+
+  // Speed up the ADC for peak sampling: prescaler /16 -> ~1 MHz ADC clock,
+  // ~15 us per conversion vs ~104 us at the default /128. This is what lets
+  // the sampler catch AC peaks up to 200 kHz. (measureVCC forces /128 itself.)
+  ADCSRA = (ADCSRA & ~0x07) | _BV(ADPS2);
 
   Serial.print("VCC:");
   Serial.println(fV_ref, 3);
@@ -197,8 +222,8 @@ void loop() {
 
   // MEASURE_VCC -> re-measure supply
   if(strCmd == "MEASURE_VCC") {
-    // fV_ref = measureVCC(); // Temporarily removing to see if this is the the cause of junk a0 readings
-    // fV_pin = fV_ref * 0.97f; // Typically 97%. Check with multimeter
+    fV_ref = measureVCC();
+    fV_pin = fV_ref * 0.97f; // Typically 97%. Check with multimeter
     Serial.print("VCC:");
     Serial.println(fV_ref, 3);
     return;
