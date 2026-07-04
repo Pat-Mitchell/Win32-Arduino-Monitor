@@ -25,3 +25,5 @@ The name comes from the schematic's layout that arranges for switches in the sha
 ### "Shoot-through" Danger
 
 An aspect of h-bridge topology is avoiding a failure state known as shoot-through. If both the top switch and bottom switch on the same leg are turned on at the same time, it creates a direct short cirduit from the power supply to the ground. This instantly destroys the transitors. To prevent this, gate drivers enforce a brief delay called **dead time** where switches are allowed to open and one trasitor completely turns off before its partner turns on.
+
+## DC Motors as Electrical Loads
