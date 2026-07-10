@@ -58,6 +58,35 @@ Without flyback protection, the high voltage spike searches for the path of leas
 
 - Permanent failure: The stransistor shorts out permanently, killing the h-bridge and potentially back-feeding high voltage into the microcontroller.
 
-## L298N Wiring and Flyback Protection
+### L298N Wiring and Flyback Protection
 
 The L298N bridge purchased for this project does have flyback diodes already soldered in place, removing the need for additional wiring. Eight diodes (four per motor) are visible next to the aluminum heat sink.
+
+## PWM Motor Speed Control
+
+Just like in the PWM Dimmer project, Pulse Width Modulation regulates the average voltage by rapidly toggling the full supply voltage ($V_{\text{cc}}$) on and off. Duty cycle ($D$) represents the percentage of time the voltage stays on during a single switching period. DC motors contains heavy mechanical components and copper windings that cannot react instantly to microsecond pulses; creating a natural low-pass filter that responds to the average DC voltage in the circuit:
+
+$$V_{\text{avg}} = D \times V_{\text{cc}}$$
+
+### Efficiency: PWM vs. Series Resistor
+
+PWM is significantly more efficient than a linear resistor because of how electronic switches manage power dissipation ($P = I \times V$).
+
+| Features | PWM (H-Bridge Switches) | Series Resistor (linear controller) |
+| --- | --- | --- |
+| Operating State | Alternates between fully **ON** and **OFF** | Stays continously partially restrictive | 
+| "ON" State Physics | High current flows and switch resistance is near zero. Meaning across it is near zero | The voltage drop across the resistor is significant while carrying motor current |
+"OFF" State Physics | Full supply voltage drops across the switch. Current is 0; Power is 0. | Always connected. "Off" implies resistor is dissipating all or most power as heat. |
+| Energy Waste | Minimal heat loss. Nearly all power is transferred to the motor | Massive heat waste ($I^2R$ losses) leading to low efficiency and high battery drain. |
+
+### Stiction (Static Friction)
+
+Stiction is the static friction holding a resting motor shaft in place. A brief burst of high torque is required to break the initial friction and get the motor spinning. There is no universal minimum duty cycle threshold for a motor to break stiction. It relies entirely on the motor's build, internal friction, and mechanical load to overcome. Typically, small hobby DC motors require 15% to 25% duty cycle. Anything below the threshold will cause the motor to hum in place without spinning.
+
+## L298N Module
+
+The BOJACK L298N motor driver module used for this project is a popular dual h-bridge controller commonly used for hobby robotics.
+
+### Internal Transitor Architecture
+
+The L298N module utilizes bipolar junction transitors (BJTs) rather than MOSFETs.
