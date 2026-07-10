@@ -89,4 +89,26 @@ The BOJACK L298N motor driver module used for this project is a popular dual h-b
 
 ### Internal Transitor Architecture
 
-The L298N module utilizes bipolar junction transitors (BJTs) rather than MOSFETs.
+The L298N module utilizes bipolar junction transitors (BJTs) rather than MOSFETs. It uses a combination of NPN and PNP bipolar transitors arranged in a Darlington pair configuration to handle the higher output current. This architecture is the primary reason for the large aluminum heatsink as BJTs generate a significant amount of heat under load.
+
+### Logic Inputs and Truth Table
+
+The module exposes pins to control two independant DC motors (Motor A and Motor B). Motor A is controlled by ENA (Enable A), IN1, and IN2. Likewise, Motor B is controlled by ENB, IN3, and IN4.
+
+**Truth Table**
+
+| ENA/(Speed/Enable) | IN1 | IN2 | Motor Output (OUT1, OUT2) | Motor Behavior | 
+| --- | --- | --- | --- | --- |
+| LOW(0) | X(Any) | X(Any) | Off/High-Impedance | Coast/Stop (no power) |
+| HIGH (1)/PWM | LOW(0) | LOW(0) | Low/Low | Fast Motor braking |
+| HIGH(1)/PWM | HIGH(1) | HIGH(1) | High/High | Fast Motor braking |
+| HIGH(1)/PWM | HIGH(1) | LOW(0) | High/Low | Forward (Speed mirrors PWM %) |
+| HIGH(1)/PWM | LOW(0) | HIGH(1) | Low/High | Reverse (Speed mirros PWM %) |
+
+### Voltage Drop and Motor Voltage
+
+Bipolar transitors have a fixed internal saturation voltage drop ($V_{CE(sat)}$). In the L298N, current must pass through two BJTs to complete the motor circuit. The total internal voltage drop varies based on the current the motor draws. At a low current draw (~0.5A to 1.0A), the total drop is roughly 1.8V to 2.5V. If the motor draws its maximum rated current of 2A, the internal voltage drop can be 4.9V. The motor, therefore, receives the source power supply ($V_{cc}$) minus the module's intermal voltage drop:
+
+$$V_{motor} = V_{cc} - V_{drop}$$
+
+To use the L298N module, an external power supply is needed to power the DC motor. The Arduino's 5V power supply is limited to 400mA - 500mA compared to the DC Motor's 1000mA current draw. To avoid destroying itself, the Arduino's current overdraw detection resets the board.
