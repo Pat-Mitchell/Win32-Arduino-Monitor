@@ -112,3 +112,36 @@ Bipolar transitors have a fixed internal saturation voltage drop ($V_{CE(sat)}$)
 $$V_{motor} = V_{cc} - V_{drop}$$
 
 To use the L298N module, an external power supply is needed to power the DC motor. The Arduino's 5V power supply is limited to 400mA - 500mA compared to the DC Motor's 1000mA current draw. To avoid destroying itself, the Arduino's current overdraw detection resets the board.
+
+### Direction Change Sequence
+
+A safe direction change sequence is required to avoid shoot-through and current spikes from back-EMF and stall:
+
+1. Set ENA PWM to 0%
+
+2. Wait a minimum of 50ms (dead time) for motor current to decay and back-EMF to reduce
+
+3. Set IN1/IN2 to new direction
+
+4. Ramp ENA PWM up gradually to target
+
+## Current sensor
+
+To sense the current through the DC motor, a small resistor in parallel with a low-pass filter are connected between the DC motor's ground wire and the L298N module:
+
+         [ DC MOTOR (-) OUTPUT ]
+                      │
+                      ├───┐
+                      │   │
+             Sensing  │  [R2] Filter Resistor (1 kΩ)
+            Resistor [R1] │
+             (1Ω)     │   ▼  [To Arduino Analog Pin]
+                      │   │  
+                      │  ─┴─ [C1] Filter Capacitor (10 µF)
+                      │  ───  
+                      │   │   
+     [ SYSTEM GND ] ──┴───┘
+
+The sensing resistor path enables the normal function of the DC motor while the low-pass filter converts the square wave of the PWM signal to a steady DC voltage. The arduino ADC reads the voltage and converts the data to current using Ohm's law.
+
+**Note:** To avoid damaging the arduino, the low-pass filter must to be at the negative end of the DC motor. The current cannot be swapped. Only IN1 shall be enabled while reading data.
