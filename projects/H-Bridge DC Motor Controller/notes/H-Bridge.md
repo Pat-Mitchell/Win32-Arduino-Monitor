@@ -127,7 +127,7 @@ A safe direction change sequence is required to avoid shoot-through and current 
 
 ## Current sensor
 
-To sense the current through the DC motor, a small resistor in parallel with a low-pass filter are connected between the DC motor's ground wire and the L298N module:
+To sense the current through the DC motor, a small resistor in parallel with a low-pass filter are connected between the H-bridge modules's ground output and the system ground:
 
          [ DC MOTOR (-) OUTPUT ]
                       │
@@ -143,5 +143,3 @@ To sense the current through the DC motor, a small resistor in parallel with a l
      [ SYSTEM GND ] ──┴───┘
 
 The sensing resistor path enables the normal function of the DC motor while the low-pass filter converts the square wave of the PWM signal to a steady DC voltage. The arduino ADC reads the voltage and converts the data to current using Ohm's law.
-
-**Note:** To avoid damaging the arduino, the low-pass filter must to be at the negative end of the DC motor. The current cannot be swapped. Only IN1 shall be enabled while reading data.
