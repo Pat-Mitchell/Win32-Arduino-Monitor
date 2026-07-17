@@ -181,26 +181,71 @@ void setup() {
 }
 
 void loop() {
-  
+  // ────── ⋆⋅☆⋅⋆ ────────
+  // Command Handling
+  // ────── ⋆⋅☆⋅⋆ ────────
+  if(Serial.available() > 0) {
+    String strCmd = Serial.readStringUntil('\n');
+    strCmd.trim();
+
+    if(strCmd.startsWith("SPEED:")) {
+      if(!bStall) {
+        int iVal = strCmd.substring(6).toInt();
+        setMotor(iVal);
+      } else {
+        // Reject speed commands while stalled
+        Serial.println("ALERT:STALL");
+      }
+    } else if(strCmd == "BRAKE") {
+      bStall = false;
+      setBrake();
+    } else if(strCmd == "COAST") {
+      bStall = false;
+      setMotor(0);
+    } else if(strCmd == "CLEARSTALL") {
+      bStall = false;
+      lStallStart = 0;
+      setMotor(0);
+      Serial.println("STALL:CLEARED");
+    } else if(strCmd == "MEASURE_VCC") {
+      fV_ref = measureVCC();
+      fV_pin = fV_ref * 0.97f;
+      Serial.print("VCC:");
+      Serial.println(fV_ref, 3);
+    } else if(strCmd.startsWith("SETVPIN:")) {
+      fV_pin = strCmd.substring(8).toFloat();
+      Serial.print("VPIN:");
+      Serial.println(fV_pin, 3);
+    }
+  }
+
+  // ────── ⋆⋅☆⋅⋆ ────────
+  // Periodic Telemetry
+  // ────── ⋆⋅☆⋅⋆ ────────
+  static long lLastReport = 0;
+  long lNow = millis();
+  if(lNow - lLastReport < iReport_ms) return;
+  lLastReport = lNow;
+
+  float fCurrent = readCurrentA();
+  checkStall(fCurrent);
+
+  // Direction string
+  const char* szDir;
+  if(bBraking) szDir = "B";
+  else if(bCoast || iSpeed  == 0) szDir = "C";
+  else if(iSpeed > 0) szDir = "F";
+  else szDir = "R";
+
+  // Format: "SPD:xx,DIR:F,CURR:x.xxx,VCC:x.xxx,STALL:n/n"
+  Serial.print("SPD:");
+  Serial.print(abs(iSpeed));
+  Serial.print(",DIR:");
+  Serial.print(szDir);
+  Serial.print(",CURR:");
+  Serial.print(fCurrent, 3);
+  Serial.print(",VCC:");
+  Serial.print(fV_ref, 3);
+  Serial.print(",STALL:");
+  Serial.println(bStall ? 1 : 0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
