@@ -64,3 +64,58 @@ struct CurrentPlotPanel {
 
   void Draw(HDC hdc) const;
 };
+
+// ────── ⋆⋅☆⋅⋆ ────────
+// HBridgeWindow
+// ────── ⋆⋅☆⋅⋆ ────────
+
+class HBridgeWindow : public Window {
+  public:
+    HBridgeWindow();
+    ~HBridgeWindow();
+
+  protected:
+    void OnCreate() override;
+    void OnPaint(HDC hdc) override;
+    void OnCommand(int iControlId, int iNotifCode) override;
+    void OnScroll(HWND hwnd_control, int iCode) override;
+    void OnTimer(int iTimerId) override;
+    void OnDestroy() override;
+
+  private:
+    bool ParseLine(const wchar_t* szLine);
+    void UpdateSpeedLabel(int iSpeed);
+    void ShowStallAlert();
+    void OnConnect();
+    void Ondisconnect();
+
+  // ────── ⋆⋅☆⋅⋆ ────────
+  // Members
+  // ────── ⋆⋅☆⋅⋆ ────────
+  SerialPort port;
+  CurrentPlotPanel plot;
+
+  char arrLineBuf[READ_BUF * 4];
+  int iLineBufLen;
+  long lRecStart;
+  int iLastSpeed;
+  bool bStallAlertShown;
+
+  ComboBox* cmb_port;
+  Button* btn_connect;
+  Button* btn_disc;
+  Trackbar* trk_speed;
+  Label* lbl_speed_val;
+  Button* btn_brake;
+  Button* btn_coast;
+  Button* btn_clearstall;
+  TextInput* edit_vpin;
+  Button* btn_setvpin;
+  Button* btn_export;
+
+  Label* lbl_spd_val; // Speed from telemetry
+  Label* lbl_dir_val; // direction from telemetry
+  Label* lbl_curr_val; // current in mA
+  Label* lbl_vcc_val; // VCC in volts
+  Label* lbl_stall_status;
+};

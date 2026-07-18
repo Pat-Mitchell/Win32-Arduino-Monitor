@@ -89,7 +89,9 @@ The BOJACK L298N motor driver module used for this project is a popular dual h-b
 
 ### Internal Transitor Architecture
 
-The L298N module utilizes bipolar junction transitors (BJTs) rather than MOSFETs. It uses a combination of NPN and PNP bipolar transitors arranged in a Darlington pair configuration to handle the higher output current. This architecture is the primary reason for the large aluminum heatsink as BJTs generate a significant amount of heat under load.
+The L298N module utilizes bipolar junction transitors (BJTs) rather than MOSFETs. It uses a combination of NPN and PNP bipolar transitors arranged in a Darlington pair [[^1]](#footnote-1) configuration to handle the higher output current. This architecture is the primary reason for the large aluminum heatsink as BJTs generate a significant amount of heat under load.
+
+[^1]: A Darlington pair is an electronic circuit that connects two transistors together. The first transitor amplifies a small current and the second transitor amplifies it even more. It acts like one "super" transistor with massive amplification power, allowing a tiny input to control big loads. Of its key applications, the one most interesting with this project is the high-current switching required to safely drive heavy loads like motors from low-power microcontroller pins.
 
 ### Logic Inputs and Truth Table
 

@@ -17,9 +17,9 @@
 <circle cx="295" cy="448" r="3.5" fill="rgb(250, 249, 245)"/>
 
 <!-- External supply block -->
-<rect x="250" y="18" width="110" height="52" rx="8" fill="#f5f5f5" stroke="#888888" stroke-width="1"/>
-<text font-family="sans-serif" font-size="13" font-weight="500" fill="#333333" text-anchor="middle" x="305" y="40">5–9V supply</text>
-<text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="middle" x="305" y="56">motor power</text>
+<rect x="250" y="18" width="110" height="52" rx="8" fill="#888888" stroke="#f5f5f5" stroke-width="1"/>
+<text font-family="sans-serif" font-size="13" font-weight="500" fill="#f5f5f5" text-anchor="middle" x="305" y="40">5–9V supply</text>
+<text font-family="sans-serif" font-size="11" fill="#f5f5f5" text-anchor="middle" x="305" y="56">motor power</text>
 
 <!-- Supply +V wire -->
 <path d="M305 70 L295 70 L295 90" fill="none" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
@@ -27,19 +27,19 @@
 <path d="M250 44 L155 44 L155 448" fill="none" stroke="rgb(250, 249, 245)" stroke-width="1.5"/>
 
 <!-- L298N block -->
-<rect x="195" y="90" width="200" height="260" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
-<text font-family="sans-serif" font-size="14" font-weight="500" fill="#92400e" text-anchor="middle" x="295" y="280">L298N</text>
-<text font-family="sans-serif" font-size="11" fill="#b45309" text-anchor="middle" x="295" y="298">H-Bridge module</text>
+<rect x="195" y="90" width="200" height="260" rx="8" fill="#d97706" stroke="#fef3c7" stroke-width="1"/>
+<text font-family="sans-serif" font-size="14" font-weight="500" fill="#fef3c7" text-anchor="middle" x="295" y="280">L298N</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="middle" x="295" y="298">H-Bridge module</text>
 
 <!-- L298N pin labels -->
-<text font-family="sans-serif" font-size="11" fill="#555555" text-anchor="middle" x="295" y="107">VS ↑</text>
-<text font-family="sans-serif" font-size="11" fill="#555555" text-anchor="middle" x="295" y="342">GND ↓</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="end" x="388" y="120">VSS</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="end" x="388" y="165">ENA</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="end" x="388" y="200">IN1</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="end" x="388" y="235">IN2</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="start" x="202" y="210">OUT1</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" text-anchor="start" x="202" y="250">OUT2</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="middle" x="295" y="107">VS ↑</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="middle" x="295" y="342">GND ↓</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="end" x="388" y="120">VSS</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="end" x="388" y="165">ENA</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="end" x="388" y="200">IN1</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="end" x="388" y="235">IN2</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="start" x="202" y="210">OUT1</text>
+<text font-family="sans-serif" font-size="11" fill="#fef3c7" text-anchor="start" x="202" y="250">OUT2</text>
 <circle cx="395" cy="120" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="395" cy="165" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="395" cy="200" r="3" fill="rgb(250, 249, 245)"/>
@@ -48,23 +48,23 @@
 <circle cx="195" cy="250" r="3" fill="rgb(250, 249, 245)"/>
 
 <!-- DC Motor block -->
-<rect x="25" y="190" width="100" height="80" rx="8" fill="#e6f9f5" stroke="#0d9488" stroke-width="1"/>
-<text font-family="sans-serif" font-size="13" font-weight="500" fill="#0f766e" text-anchor="middle" x="75" y="226">DC Motor</text>
-<text font-family="sans-serif" font-size="11" fill="#0f766e" text-anchor="middle" x="75" y="244">3–6V</text>
+<rect x="25" y="190" width="100" height="80" rx="8" fill="#0d9488" stroke="#e6f9f5" stroke-width="1"/>
+<text font-family="sans-serif" font-size="13" font-weight="500" fill="#e6f9f5" text-anchor="middle" x="75" y="226">DC Motor</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f9f5" text-anchor="middle" x="75" y="244">3–6V</text>
 <circle cx="125" cy="210" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="125" cy="250" r="3" fill="rgb(250, 249, 245)"/>
-<text font-family="sans-serif" font-size="11" fill="#333333" x="130" y="208">A</text>
-<text font-family="sans-serif" font-size="11" fill="#333333" x="130" y="248">B</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f9f5" x="130" y="208">A</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f9f5" x="130" y="248">B</text>
 
 <!-- Arduino block -->
-<rect x="500" y="45" width="150" height="410" rx="8" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/>
-<text font-family="sans-serif" font-size="14" font-weight="500" fill="#0c447c" text-anchor="middle" x="575" y="72">Arduino Mega</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="120">5V</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="165">PWM ~9</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="200">D7</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="235">D8</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="420">A0</text>
-<text font-family="sans-serif" font-size="11" fill="#185fa5" x="512" y="445">GND</text>
+<rect x="500" y="45" width="150" height="410" rx="8" fill="#185fa5" stroke="#e6f1fb" stroke-width="1"/>
+<text font-family="sans-serif" font-size="14" font-weight="500" fill="#e6f1fb" text-anchor="middle" x="575" y="72">Arduino Mega</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="120">5V</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="165">PWM ~9</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="200">D7</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="235">D8</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="420">A0</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="445">GND</text>
 <circle cx="500" cy="120" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="500" cy="165" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="500" cy="200" r="3" fill="rgb(250, 249, 245)"/>
