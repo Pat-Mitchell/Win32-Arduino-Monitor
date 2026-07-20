@@ -19,3 +19,4 @@
 #include "wrappers\win32Wrappers\TextInput.h"
 #include "wrappers\win32Wrappers\ComboBox.h"
 #include "wrappers\serialPortWrappers\SerialPort.h"
+#include "wrappers\xinputWrappers\XInputController.h"
