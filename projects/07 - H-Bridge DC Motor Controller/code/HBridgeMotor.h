@@ -87,7 +87,7 @@ class HBridgeWindow : public Window {
     void UpdateSpeedLabel(int iSpeed);
     void ShowStallAlert();
     void OnConnect();
-    void Ondisconnect();
+    void OnDisconnect();
 
   // ────── ⋆⋅☆⋅⋆ ────────
   // Members
