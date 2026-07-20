@@ -324,7 +324,7 @@ HBridgeWindow::HBridgeWindow()
           return;
         }
         wchar_t arrPath[MAX_PATH];
-        if(!ShowSaveDialog(hwnd_self, L"CSV Files\0*.csv\0ALL Files\0*.*", L"csv", arrPath, MAX_PATH))
+        if(!ShowSaveDialog(hwnd_self, L"CSV Files\0*.csv\0ALL Files\0*.*\0", L"csv", arrPath, MAX_PATH))
           return;
         if(!ExportCSV(arrPath, plot.arrTime, plot.arrCurr, plot.iCount))
           MessageBox(hwnd_self, L"Export failed.", L"Export", MB_OK | MB_ICONERROR);
