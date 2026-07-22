@@ -4,6 +4,14 @@
 
 #pragma once
 
+// Force UNICODE
+#ifndef UNICODE
+#define UNICODE
+#endif
+#ifndef _UNICODE
+#define _UNICODE
+#endif
+
 // Windows API - by far the heaviest include in this project
 #include <windows.h>
 
