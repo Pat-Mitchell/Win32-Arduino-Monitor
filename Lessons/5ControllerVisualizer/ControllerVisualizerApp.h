@@ -63,12 +63,14 @@ class ControllerVisualizerApp : public Window {
     TriggerPanel panel_rt;
 
     // Win32 controls
-    ComboBox cmb_player;
-    Label lbl_status;
-    Trackbar trk_deadzone;
-    Label lbl_deadzone_val;
+    ComboBox* cmb_player;
+    Label* lbl_status;
+    Trackbar* trk_deadzone;
+    Label* lbl_deadzone_val;
+    Label* lbl_playerTxt;
+    Label* lbl_deadzoneTxt;
 
     // State
-    BOOL bWasConnected // Connection state from precious tick
+    BOOL bWasConnected; // Connection state from precious tick
     HBRUSH hbr_background; // Dark background brush
 };

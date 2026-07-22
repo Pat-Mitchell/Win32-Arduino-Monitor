@@ -18,5 +18,6 @@
 #include "wrappers\win32Wrappers\Label.h"
 #include "wrappers\win32Wrappers\TextInput.h"
 #include "wrappers\win32Wrappers\ComboBox.h"
+#include "wrappers\win32Wrappers\Trackbar.h"
 #include "wrappers\serialPortWrappers\SerialPort.h"
 #include "wrappers\xinputWrappers\XInputController.h"
