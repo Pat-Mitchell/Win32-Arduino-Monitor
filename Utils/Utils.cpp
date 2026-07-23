@@ -36,6 +36,58 @@ float ParseFloat(const wchar_t* szSrc, const wchar_t* szKey) {
   return wcstof(pFound, nullptr);
 }
 
+void FormatReadout(wchar_t* arrBuf, int iBufLen, const wchar_t* szLabel, float fValue, int iDecimalPlaces, const wchar_t* szUnit) {
+  // Clamp decimal places to a sensible range
+  if(iDecimalPlaces < 0) iDecimalPlaces = 0;
+  if(iDecimalPlaces > 6) iDecimalPlaces = 6;
+
+  // Compute the power of 10 multiplier for the fractional part
+  int iMultiplier = 1;
+  for (int i = 0; i < iDecimalPlaces; i++) iMultiplier *= 10;
+
+  // Handle negative values
+  BOOL bNeg = (fValue < 0.0f);
+  if(bNeg) fValue = -fValue;
+
+  int iInteger = (int)fValue;
+  int iFrac = (int)((fValue - (float)iInteger) * iMultiplier + 0.5f);
+
+  // Handle carry
+  if(iFrac >= iMultiplier) {
+    iFrac -= iMultiplier;
+    iInteger++;
+  }
+
+  if(iDecimalPlaces > 0) {
+    // Build format string for fraction part with leading zeros
+    wchar_t arrFmtFrac[8];
+    wsprintf(arrFmtFrac, L"%%0%dd", iDecimalPlaces);
+
+    wchar_t arrFrac[16];
+    wsprintf(arrFrac, arrFmtFrac, iFrac);
+
+    wsprintf(arrBuf, L"%s: %s%d.%s %s", szLabel, bNeg ? L"-" : L"", iInteger, arrFrac, szUnit);
+  } else {
+    wsprintf(arrBuf, L"%s: %s%d %s", szLabel, bNeg ? L"-" : L"", iInteger, szUnit);
+  }
+
+  // Ensure null termination within buffer bounds
+  arrBuf[iBufLen - 1] = L'\0';
+}
+
+float MapFloat(float fVal, float fInMin, float fInMax, float fOutMin, float fOutMax) {
+  // Guard against divide by zero if the input range is degenerate
+  if(fInMax == fInMin) return fOutMin;
+
+  return (fVal - fInMin) / (fInMax - fInMin) * (fOutMax - fOutMin) + fOutMin;
+}
+
+float ClampFloat(float fVal, float fMin, float fMax) {
+  if(fVal < fMin) return fMin;
+  if(fVal > fMax) return fMax;
+  return fVal;
+}
+
 BOOL ShowSaveDialog(HWND hwnd_owner, const wchar_t* szFilter, const wchar_t* szDefExt, wchar_t* arrPathOut, int iBufLen) {
   OPENFILENAME ofn = {};
   arrPathOut[0] = L'\0';

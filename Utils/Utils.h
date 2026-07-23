@@ -20,6 +20,37 @@ void ScanComPorts(ComboBox* cmb_port);
 /// @return Parsed float or -1.0 if the key is not found.
 float ParseFloat(const wchar_t* szSrc, const wchar_t* szKey);
 
+/// @brief Formats a label, value, and unit int a display string.
+///   e.g. FormatReadout(buf, 32, L'V", 4.87f, 2, L"V") -> L"V": 4.87 v"
+///   Used by ReadoutPanel-style displays to keep formatting consistent
+///   across all projects
+/// @param arrBuf Desitination buffer
+/// @param iBufLen Buffer size in characters
+/// @param szLabel Field label e.g. L"V"
+/// @param fValue value to display
+/// @param iDecimalPlaces Number of decimal places to show
+/// @param szUnit Unit suffix e.g. L"V", L"mA", L"C"
+void FormatReadout(wchar_t* arrBuf, int iBufLen, const wchar_t* szLabel, float fValue, int iDecimalPlaces, const wchar_t* szUnit);
+
+/// @brief Linearly maps fVal from one range to another
+///   Equivalent to Arduino's map() but for floats and with no
+///   integer truncation. Does not clamp. Call ClampFloat first
+///   if the input may exceed [fInMin, fInMax].
+/// @param fVal Input value map.
+/// @param fInMin Lower bound of the input range
+/// @param fInMax Upper bound of the input range
+/// @param fOutMin Lower bound of the output range
+/// @param fOutMax Upper bound of the output range
+/// @return Mapped value in the output range
+float MapFloat(float fVal, float fInMin, float fInMax, float fOutMin, float fOutMax);
+
+/// @brief Clamps fVal to the range [fMin, fMax]
+/// @param fVal Value to clamp
+/// @param fMin Minimum allowed value
+/// @param fMax Maximum allowed value
+/// @return Clamped value
+float ClampFloat(float fVal, float fMin, float fMax);
+
 /// @function ShowSaveDialog
 /// @brief Opens a Win32 Save As dialog and returns the chosen file path
 ///        Returns FALSE if the user cancels.
