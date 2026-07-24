@@ -1,0 +1,11 @@
+# 3-Phase Power
+
+Three-phase power is an electrical system that uses three separate alternating currents transmitted over three wires. Each current wave is offset by 120 electical degrees that provides a continuous, uninterrupted flow of energy. Commercial and industrial facilities usually use a three-phase supply to better accommodate higher loads as compared to the single-phase power supply that residential homes are usually served. A three-phase power supplu can transmit three times as much power as a single-phase power supply while only needing one additional wire (three instead of two).
+
+## Problems with Single-Phase Power
+
+Single-phase electricity relies on a single alternating current waveform that rises and falls periodically. The voltage waveform crosses the zero-volt line twice with each AC cycle. The power output drops to zero 120 times per second on a 60Hz grid (or 100 times per second on a 50Hz grid in Europe). Electrical motors running on single-phase supplies experience a jerky torque output due to the periodic power supply. The constant pulsing creates excessive mechanical vibration, louder operation, and faster wear on internal components. Large single-phase motors are also incapable of self-starting. They require complex additional components like start-capacitors, centrifugal switches, or shading coils to kickstart rotation.
+
+## How Three-Phase Power Solves these Problems
+
+Three-phase systems combine three separate AC voltage wave forms. With each wave delayed or offset by exactly $120^\circ$ 
