@@ -8,4 +8,4 @@ Single-phase electricity relies on a single alternating current waveform that ri
 
 ## How Three-Phase Power Solves these Problems
 
-Three-phase systems combine three separate AC voltage wave forms. With each wave delayed or offset by exactly $120^\circ$ 
+Three-phase systems combine three separate AC voltage wave forms. With each wave delayed or offset by exactly $120^\circ$ relative to the next. Because the three wave forms are staggered, one phase is always peking or climing as another falls. The mathematical sum of hte power from all three phases remains completely constant at every single instant. The jerky torque output is no longer present and, therefore, eliminates the loud mechanical vibrations and faster wear on internal components. The $120^\circ$ physical separationg of the currents naturally generates a rotating magnetic field inside the electrical motor that self-starts the motor as soon as power is delivered without the need for the previously mentioned additional components.
