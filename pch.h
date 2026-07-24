@@ -24,6 +24,7 @@
 #include "wrappers\win32Wrappers\Window.h"
 #include "wrappers\win32Wrappers\Button.h"
 #include "wrappers\win32Wrappers\Label.h"
+#include "wrappers\win32Wrappers\PlotPanel.h"
 #include "wrappers\win32Wrappers\TextInput.h"
 #include "wrappers\win32Wrappers\ComboBox.h"
 #include "wrappers\win32Wrappers\Trackbar.h"
