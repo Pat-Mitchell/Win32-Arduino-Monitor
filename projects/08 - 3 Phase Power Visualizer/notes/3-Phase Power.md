@@ -73,3 +73,88 @@ The phase currects no longer sum to zero. The current no longer sums up to zero 
 - Fault conditions: Line-to-ground or line-to-line faults that temporarily drag down the coltage of an individual phase.
 
 - Blown fuses: A blown fuse on a single phase creates an extreme single-phasing condition for three-phase equipment.
+
+### Unplanned Unbalanced Loads
+
+In a Wye configuration, a neutral wire can be installed as a safety valve in the event of unplanned failures that cause unbalanced loads. The neutral wire can safely carry the current back to the source while the two remaining wires can operate at normal voltages to protect single-phase equipment. Without a neutral wire, the current in one can drop while the other spikes dangerously high. Electronics connected to the line will be instantly destroyed.
+
+In a Delta configuration, a neutral wire cannot physically have a neutral wire. In the event of something like a blown fuse, electrical equipment experiences single-phasing where the two remaining phases pull massive amount of current to keep up. Because of the lack of a neutral wire, protective relays and thermal overloads are intalled to detect current loss or phase spikes and trip a breaker before machinery destroys itself.
+
+### Phase Sequence
+
+A-B-C positive phase sequence means voltage peaks arrive in the order of A, then B, then C spaced $120^\circ$ apart. Reversing any two power wires changes the order to A-C-B negative sequence. This flips the physical rotation of the moto's internal magnetic field, forcing the rotor to spin backwards.
+
+Inside motors, three physical coils are placed around the frame, connected to wires A, B, C. In positive phase sequence, voltage peaks arrive in the order of A, B, and C. As the power waves peak one after another, they create a magnetic pull that moves in a circle. The metallic rotor cahses the moving magnetic circle.
+
+Swapping the wires to negative sequences changes the peak order to A-C-B, makes the magnetic field spin the other way, and reverses the spin of the rotor.
+
+## Star and Delta Configurations
+
+Star and delta configurations are the two ways to cennect three-phase electrical systems. A star (Y) conection links each phase to a central neutral point, making line voltage $\sqrt{3}$ times the phase voltage while line current equals phaes current. A delta ($\delta$) connection forms a closed loop, making line voltage euqal to phase voltage while line current is $\sqrt{3}$ times the phase current.
+
+               L1                                  L1
+               \                                   *
+               /  Winding 1                       / \
+               \                                 /   \
+               |                          Winding     Winding
+               +----- N (Neutral)            1           3
+              / \                              /       \
+             /   \                            \         /
+        Winding   Winding                    /           \
+          2        3                        *-------------*
+         /           \                     /               \
+        /             \                   L2               L3
+        L2           L3               Winding 2
+             STAR                                DELTA
+
+### Star (Y) Configuration
+
+Three phase windings connect to a single central point called the neutral point. It uses four wires (three live phases and one neutral). 
+
+The line voltage ($V_L$) is $\sqrt{3}$ times the phase voltage ($V_{ph}$):
+
+$$V_L = \sqrt 3 \times V_{ph}$$
+
+The lines current ($I_L$) is equal to the phase current ($I_{ph}$):
+
+$$I_L = I_{ph}$$
+
+**Key features** 
+
+The Star configuration can supply two different voltages obtained from line-to-line and line-to-neutral connections. Typical 120/208V configuations give 208V when connecting any two phases and 120V when connecting one phase to neutral.
+
+Unbalanced loads are handled safelt through the neutral wire.
+
+### Delta ($\Delta$) Configuration
+
+Three phase windings connect end-to-end in a triangle loop with no central neutral point. It uses three wires (three live phases).
+
+The line voltage ($V_L$) equals the phase voltage ($V_{ph}$):
+
+$$V_L = V_{ph}$$
+
+The line current ($I_L$) is $\sqrt 3$ times the phase current ($I_{ph}$):
+
+$$I_L = \sqrt 3 \times I_{ph}$$
+
+**Key Feature**
+
+The delta configuration is robust and sel-contained. If one phase fails, the other two can still supply power in an open-delta arrangement (at reduced total capacity).
+
+### Applications 
+
+**Star Configuration**
+
+- Long-distance power transimission lines. Lower phase voltage requires less insulation.
+
+- Commercial and residential low-voltage distribution (providing both 400V/230V or 208V/120V).
+
+- Soft-starting large electic motors to reduce high initial inrush current.
+
+**Delta Configuration**
+
+- Heavy industrial quipment and large motors requiring high starting torque.
+
+- Power distribution networks over short distances.
+
+- The primary side of substations and transformers feeding balanced loads.
