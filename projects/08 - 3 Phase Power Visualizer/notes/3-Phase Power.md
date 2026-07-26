@@ -158,3 +158,110 @@ The delta configuration is robust and sel-contained. If one phase fails, the oth
 - Power distribution networks over short distances.
 
 - The primary side of substations and transformers feeding balanced loads.
+
+### The $\sqrt3$ factor
+
+The $\sqrt3$ factor is derived from the phasor subtraction of two phase voltages that are separated by a $120^\circ$ angle. 
+
+In a balanced Star connection, line-to-line ($V_L$) is measured between two different phase terminals. The line voltage is the vector difference between the two phase voltages relative to the neutral point($N$).
+
+$$\vec{V}_{AB} = \vec{V}_{AN} - \vec{V}_{BN}$$
+
+Assumign the RMS magnitude of each phase voltage is $V_{ph}$, the two vectors are separated by exactly $120^\circ$. Subtracting $\vec{V}_{BN}$ inverts its direction (creating a $60^\circ$ angle relative to $\vec{V}_{AN}$).
+
+Using the law of cosines for vector subtraction (where the angle between the two original vectors is $\theta = 120^\circ$):
+
+$$V^2_L = V^2_{ph} + V^2_{ph} - 2 \cdot V_{ph} \cdot V_{ph} \cdot \cos(120^\circ)$$
+
+$$V^2_L = V^2_{ph} + V^2_{ph} - 2 \cdot V^2_{ph}(-0.5)$$
+
+$$V^2_L = V^2_{ph} + V^2_{ph} - 2 V^2_{ph}(-0.5)$$
+
+$$V^2_L = V^2_{ph} + V^2_{ph} + V^2_{ph}$$
+
+$$V^2_L = 3 V^2_{ph}$$
+
+$$V_L = \sqrt3 \cdot V_{ph}$$
+
+### Star and Delta configurations are duals[[^3]](#footnote-3) of each other
+
+[^3]: In network theory, duality means that the equations governing one circuit configuration mirror the equations of another if you swap specific variables (Voltage <-> Current, Series <-> Parallel).
+
+**Star/Delta Duality Table**
+
+| Attribute | Star Configuration | Delta Configuration |
+| --- | --- | --- |
+Circuit Type | Series-like node connections | Parallel-like loop connections |
+| Governing Law | Kirchhoff's Voltage Law | Kirchhoff's Current Law |
+| Equal Variable | Line Current = Phase Current ($I_L = I_{ph}$) | Line Voltage = Phase Voltage ($V_L = V_{ph}$) |
+| $\sqrt{3}$ Variable | Line VOltage = $\sqrt3 \times V_{ph}$ | Line current = $\sqrt3 \times I_{ph}$ |
+
+In Star (KVL Dual): Two phase voltage vectors meet at a central serial node. To find the line voltage, KVL is used to find the difference between two potentials separated by $120^\circ$. The vecto math yields $\sqrt3 \cdot V_{ph}$.
+
+Int Delta (KCL Dual): Two phase current vectos meet at a parallel line junction. To find the line current, KCL is used to find the difference between two entering/exiting currents separated by $120^\circ$ ($\vec{I}_L = \vec{I}_{phaseA} - \vec{I}_{phaseB}$).
+
+Because of the geometic angles and vector subtraction mathematics are identical, the current in a delta configuration scales by the same $\sqrt3$ factor as the voltage does in a star configuration.
+
+## 3-Phase Power Equation
+
+The total three-phase power formula is:
+
+$$P = \sqrt 3 \cdot V_L \cdot I_L \cdot \cos (\phi)$$
+
+Where:
+
+* $P$ is the total active power in Watts (W).
+
+* $V_L$ is the line-to-line RMS voltage.
+
+* $I_L$ is the line RMS current.
+
+* $\cos (\phi)$ is the system power factor (the phase angle difference between voltage and current).
+
+Alternatively, using phase variables, the total power is:
+
+$$P = 3 \cdot V_{ph} \cdot I_{ph} \cdot \cos (\phi)$$
+
+In a balanced system where the power factor is 1.0 ($\phi = 0^\circ$), the voltages for the three phases (shifted by $120^\circ$ or ${2 \pi} \over 3$ radians) are:
+
+$$v_1(t) = V_m \sin (\omega t)$$
+
+$$v_2(t) = V_m \sin (\omega t - {{2 \pi} \over 3})$$
+
+$$v_3(t) = V_m \sin (\omega t - {{4 \pi} \over 3})$$
+
+The currents match the voltage profiles:
+
+$$i_1(t) = I_m \sin (\omega t)$$
+
+$$i_2(t) = I_m \sin (\omega t - {{2 \pi} \over 3})$$
+
+$$i_3(t) = I_m \sin (\omega t - {{4 \pi} \over 3})$$
+
+Instantaneous power in each phase is $p=v(t) \cdot i(t)$. Using the trigonometric identity $\sin ^2(\theta) = {{1 - \cos(2 \theta)} \over 2}$, the power equations become:
+
+$$p_1(t) = V_mI_m\sin^2(\omega t) = {{V_mI_m} \over 2}[1 - \cos(2\omega t)]$$
+
+$$p_2(t) = V_mI_m\sin^2(\omega t - {2\pi\over3}) = {V_mI_m\over2}[1 - \cos(2\omega t-{4\pi\over3})]$$
+
+$$p_3(t) = V_mI_m\sin^2(\omega t-{4\pi\over3}) = {V_mI_m\over2}[1 - \cos(2\omega t-{8\pi\over3})]$$
+
+The total instantaneius power, $p_{total}(t) = p_1(t) + p_2(t) + p_3(t)$ is:
+
+$$p_{total} = {V_mI_m\over2}[3-(\cos(2\omega t)+\cos(2\omega t-{4\pi\over3})+\cos(2\omega t-{8\pi\over3}))]$$
+
+The three sosine terms represent a balanced thre0phase set of waves aoscillating at twice the system frequency ($2\omega$). The sum of any balanced three-phase sinusoidal set is always zero:
+
+$$\cos(2\omega t) +\cos(2\omega t-{4\pi\over3}) + \cos(2\omega t-{8\pi\over3}) = 0$$
+
+Substituting zero back into the equation removes the time-dependent variable completely:
+
+$$p_{total}(t) = {3\over2} V_mI_m$$
+
+Because the maximum values relate to RMS values by $v_m = \sqrt 2 V_{ph}$ and $I_m=\sqrt2I_ph$, the equation simplifies into a flat constant:
+
+$$p_{total}(t)=3\cdot V_{ph}\cdot I_{ph}$$
+
+### Why it matters
+
+Single-phase motors experience structural vibration because their power drops to zero twice every cycle. Three-phase motors receive smooth and continous torque that vastly extends the lifespan of heavy industrial equipment. Generators and transmission lines also operate at maximum efficiency because they do not have to absorb or buffer cyclical energy pulses.
