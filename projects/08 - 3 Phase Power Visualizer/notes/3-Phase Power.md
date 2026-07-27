@@ -345,4 +345,4 @@ Induction motors are asynchronous machines. They rely entirely on electromagneti
 
 If the rotor were to accelerate and hit 100% synchronous speed, the motor would instantly lose its ability to turn. The rotor bars would travel at the exact same speed as the stator's magnetic field, would ride along with the magnetic wave rather than cutting through it, induced voltage drops to exactly zero (current stops flowing in the rotor), and - with no rotor current - the rotor loses its magnetic field, dropping torque to zero.
 
-Because of friction, wind resistance, and machanical loads, a rotor with zero torque will instantly slow down, causing slip to return, current to flow again, and restore torque.
+Because of friction, wind resistance, and mechanical loads, a rotor with zero torque will instantly slow down, causing slip to return, current to flow again, and restore torque.
