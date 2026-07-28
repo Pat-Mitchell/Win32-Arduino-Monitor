@@ -7,17 +7,16 @@ cd ../../..
 call build_pch.bat
 cd projects/08 - 3 Phase Power Visualizer/code
 
-echo === Building H-Bridge Motor ===
+echo === Building Phase Power Visualizer ===
 g++ main.cpp ThreePhaseApp.cpp ^
   %WRAPPERS%/win32Wrappers/Window.cpp ^
-  %WRAPPERS%/serialPortWrappers/SerialPort.cpp ^
   -o ThreePhasePower.exe ^
   -mwindows -DUNICODE -D_UNICODE -lxinput -lcomctl32
   if %errorlevel% == 0 (
     echo Build Successful. 
     echo Running...
     echo.
-    HBridgeMotor.exe
+    ThreePhasePower.exe
   ) else (
     echo Build failed!
   )

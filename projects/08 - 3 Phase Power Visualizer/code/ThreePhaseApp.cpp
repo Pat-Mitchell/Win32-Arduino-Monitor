@@ -125,7 +125,7 @@ void ThreePhaseApp::OnCommand(int iControlId, int iNotifCode) {
       RecalcAndRedraw();
     } else if(iControlId == ID_BTN_SEQ) {
       if(m_inputs.eSeq == PhaseSeq::ABC) {
-        m_inputs.eSeq = PhaseSeq::ABC;
+        m_inputs.eSeq = PhaseSeq::ACB;
         btn_seq->SetText(L"A-C-B");
       } else {
         m_inputs.eSeq = PhaseSeq::ABC;
