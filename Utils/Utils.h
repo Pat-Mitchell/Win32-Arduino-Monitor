@@ -4,6 +4,14 @@
 #pragma once
 #include "..\pch.h"
 
+#ifndef M_PI
+#define M_PI  3.14159265
+#endif
+
+#ifndef DEG_TO_RAD
+#define DEG_TO_RAD  M_PI / 180.f
+#endif
+
 /// @function ScanComPorts
 /// @brief Probs COM1-COM20 via CreateFile and populates a ComboBox
 ///        with available ports. Ports that exist but are busy are 
@@ -61,3 +69,28 @@ float ClampFloat(float fVal, float fMin, float fMax);
 /// @param iBufLen Buffer size in characters
 /// @return TRUE if a path was chosen, FALSE if cancelled
 BOOL ShowSaveDialog(HWND hwnd_owner, const wchar_t* szFilter, const wchar_t* szDefExt, wchar_t* arrPathOut, int iBufLen);
+
+/// @brief Draws a straight arrow from (iX1, iY1) to (iX2, iY2).
+///   The arowhead is a filled triangle at the tip, with two barbs
+///   offset +/-30 degrees from the stem direction.
+/// @param hdc Device context to draw into.
+/// @param iX1 Stem start X in pixels
+/// @param iY1 Stem start Y in pixels
+/// @param iX2 Arrow tip X in pixels
+/// @param iY2 Arrow tip Y in pixels
+/// @param iHeadSize Length of the arrowhead barbs in pixels
+/// @param clr Arrow color
+void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr);
+
+/// @brief Draws a circular arc with an arrowhead at the end.
+///   The head is tangent to the arc at the endpoint so it reads
+///   naturally as a rotational direction indicator.
+/// @param hdc Device context to draw into.
+/// @param iCX Center X of the arc circle in pixels
+/// @param iCY Center Y of the arc circle in pixels
+/// @param iRadius Radius of the arc in pixels
+/// @param fStartAngle Start angle in degrees. 0 = right, clockwise positive
+/// @param fSwepAngle Sweep in degrees. Positive = clockwise, negative = counter-clockwise
+/// @param iHeadSize Length of the arrowhead barbs in pixels
+/// @param clr Arrow color
+void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, float fSwepAngle, int iHeadSize, COLORREF clr);

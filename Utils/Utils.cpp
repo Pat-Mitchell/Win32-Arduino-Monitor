@@ -2,6 +2,7 @@
 /// @brief Implementation of project-wide utility functions.
 
 #include "Utils.h"
+#include <math.h> // atan2f, cosf, sinf, sqrtf
 
 void ScanComPorts(ComboBox* cmb_port) {
   cmb_port->Clear();
@@ -101,4 +102,103 @@ BOOL ShowSaveDialog(HWND hwnd_owner, const wchar_t* szFilter, const wchar_t* szD
   ofn.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 
   return GetSaveFileName(&ofn);
+}
+
+// Private helper
+/// @brief Draws a filled arrowhead triangle at (fTipX, fTipY) pointing
+///   in the direction fAngleRad. Called by both DrawArrow and DrawArcArrow
+static void DrawArrowHead(HDC hdc, float fTipX, float fTipY, float fAngleRad, int iHeadSize, COLORREF clr) {
+  // The two barb points are offset +/- 30 degrees from the stem direction
+  // meaasured from the tip back along the stem
+  // The base angle points away from the tip (stem direction + 180 degrees)
+  const float fBarb = 30.0f * DEG_TO_RAD;
+  float fBaseAng = fAngleRad + M_PI; // Direction back along stem
+
+  POINT pts[3];
+  pts[0].x = (int)fTipX;
+  pts[0].y = (int)fTipY;
+  pts[1].x = (int)(fTipX + cosf(fBaseAng - fBarb) * iHeadSize);
+  pts[1].y = (int)(fTipY + sinf(fBaseAng - fBarb) * iHeadSize);
+  pts[2].x = (int)(fTipX + cosf(fBaseAng + fBarb) * iHeadSize);
+  pts[2].y = (int)(fTipY + sinf(fBaseAng + fBarb) * iHeadSize);
+
+  HBRUSH hBrush = CreateSolidBrush(clr);
+  HPEN hPen = CreatePen(PS_SOLID, 1, clr);
+  HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+  HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+
+  Polygon(hdc, pts, 3);
+
+  SelectObject(hdc, hOldBrush);
+  SelectObject(hdc, hOldPen);
+  DeleteObject(hBrush);
+  DeleteObject(hPen);
+}
+
+// public draw arrows
+void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr) {
+  // Draw the stem line
+  HPEN hPen = CreatePen(PS_SOLID, 1, clr);
+  HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+
+  MoveToEx(hdc, iX1, iY1, NULL);
+  LineTo(hdc, iX2, iY2);
+
+  SelectObject(hdc, hOldPen);
+  DeleteObject(hPen);
+
+  // Compute the angle the stem points towards the tip
+  float fAngle = atan2f((float)(iY2 - iY1), (float)(iX2 - iX1));
+
+  DrawArrowHead(hdc, (float)iX2, (float)iY2, fAngle, iHeadSize, clr);
+}
+
+void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, float fSweepAngle, int iHeadSize, COLORREF clr) {
+  // Win32 ARC() uses a bounding rect and takes start/end points on the ellipse
+  // rather than angles. Convert angles to bounding-rect points.
+  // Angles follow GDI convention: 0 = right, clockwise positive (Y axis down)
+  float fStartRad = fStartAngle * DEG_TO_RAD;
+  float fEndAngle = fStartAngle * fSweepAngle;
+  float fEndRad = fEndAngle * DEG_TO_RAD;
+
+  // Bounding rect of the circle
+  int iLeft = iCX - iRadius;
+  int iTop = iCY - iRadius;
+  int iRight = iCX + iRadius;
+  int iBottom = iCY + iRadius;
+
+  // Start and end points on the circle circumference
+  int iStartX = iCX + (int)(cosf(fStartRad) * iRadius);
+  int iStartY = iCY + (int)(sinf(fStartRad) * iRadius);
+  int iEndX = iCX + (int)(cosf(fEndRad) * iRadius);
+  int iEndY = iCY + (int)(sinf(fEndRad) * iRadius);
+
+  HPEN hPen = CreatePen(PS_SOLID, 1, clr);
+  HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+
+  // Arc() draws counter-clockwise by default in GDI (Y-down coordinate space)
+  // For clockwise sweep, use AngleArc or swap start/end and use Arc.
+  // Swapping start/end with Arc() give clockwise arc.
+  if(fSweepAngle >= 0.0f) {
+    // Clockwise: swap start/end for GDI Arc
+    Arc(hdc, iLeft, iTop, iRight, iBottom, iStartX, iStartY, iEndX, iEndY);
+  } else {
+    // Counter-clockwise: Natural GDI direction
+    Arc(hdc, iLeft, iTop, iRight, iBottom, iEndX, iEndY, iStartX, iStartY);
+  }
+
+  SelectObject(hdc, hOldPen);
+  DeleteObject(hPen);
+
+  // Arrowhead at the end of the arc
+  // The tangent direction at the endpoint is perpendicular to the radius,
+  // rotated 90 degrees in the sweep direction.
+  float fTangentAngle;
+  if(fSweepAngle >= 0.0f) {
+    fTangentAngle = fEndRad + M_PI / 2.0f; // Clockwise Tangent
+  } else {
+    fTangentAngle = fEndRad - M_PI / 2.0f; // Counter-clockwise tangent
+  }
+
+  DrawArrowHead(hdc, (float)iEndX, (float)iEndY, fTangentAngle, iHeadSize, clr);
 }
