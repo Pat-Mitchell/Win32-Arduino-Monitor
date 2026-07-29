@@ -5,11 +5,11 @@
 #include "..\pch.h"
 
 #ifndef M_PI
-#define M_PI  3.14159265
+#define M_PI  3.14159265f
 #endif
 
 #ifndef DEG_TO_RAD
-#define DEG_TO_RAD  M_PI / 180.f
+#define DEG_TO_RAD  (M_PI / 180.f)
 #endif
 
 /// @function ScanComPorts
@@ -90,7 +90,7 @@ void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLOR
 /// @param iCY Center Y of the arc circle in pixels
 /// @param iRadius Radius of the arc in pixels
 /// @param fStartAngle Start angle in degrees. 0 = right, clockwise positive
-/// @param fSwepAngle Sweep in degrees. Positive = clockwise, negative = counter-clockwise
+/// @param fSweepAngle Sweep in degrees. Positive = clockwise, negative = counter-clockwise
 /// @param iHeadSize Length of the arrowhead barbs in pixels
 /// @param clr Arrow color
-void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, float fSwepAngle, int iHeadSize, COLORREF clr);
+void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, float fSweepAngle, int iHeadSize, COLORREF clr);

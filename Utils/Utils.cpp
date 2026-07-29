@@ -158,7 +158,7 @@ void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, flo
   // rather than angles. Convert angles to bounding-rect points.
   // Angles follow GDI convention: 0 = right, clockwise positive (Y axis down)
   float fStartRad = fStartAngle * DEG_TO_RAD;
-  float fEndAngle = fStartAngle * fSweepAngle;
+  float fEndAngle = fStartAngle + fSweepAngle;
   float fEndRad = fEndAngle * DEG_TO_RAD;
 
   // Bounding rect of the circle
