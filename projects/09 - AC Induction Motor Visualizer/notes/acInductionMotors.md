@@ -56,14 +56,49 @@ While individual fields constantly grow, shrink, and reverse direction, their tr
 
 $$B_{net} = 1.5 \times B_m$$ [[^2]](#footnote-2)
 
-Because the magnitude never changes, the magnetic fields does not pulse or flicker. It glides in smooth, continuous circle at synchronous speed ($N_s$), which is dectated by the power supply frequency ($f$) and the number of stator magnetic poles ($P$).:
+Because the magnitude never changes, the magnetic fields does not pulse or flicker. It glides in smooth, continuous circle at synchronous speed ($N_s$), which is dectated by the power supply frequency ($f$) and the number of stator magnetic poles ($P$).: 
 
 $$N_s = {120 \times f \over P}$$
 
-[^2]: The time-varying magnitudes of the magnetic fields, oscillating at angular frquency $\omega$, are shifted $120^\circ$ in time:
+[^2]: The time-varying magnitudes of the magnetic fields, oscillating at angular frequency $\omega$, are shifted $120^\circ$ in time:
 
     $$B_A(t) = B_m \cos (\omega t)$$
 
     $$B_B(t) = B_m \cos (\omega t - 120^\circ)$$
 
     $$B_C(t) = B_m \cos (\omega t - 240^\circ)$$
+
+    The net magnetic field vector $\vec B_{net}(t)$ is found by breaking each phase into components x and y:
+
+    $$\vec B_A(t) = B_m \cos (\omega t) \hat i + 0 \hat j$$
+
+    $$\vec B_B = B_m \cos (\omega t - 120^\circ)(-{1 \over 2}) \hat i + B_m \cos (\omega t - 120^\circ)({\sqrt 3 \over 2}) \hat j$$
+
+    $$\vec B_C(t) = B_m \cos (\omega t - 240^\circ)(-{1 \over 2}) \hat i + B_m \cos (\omega t - 240^\circ)(-{\sqrt 3 \over 2}) \hat j$$
+
+    Summing all three equations and isolating the $\hat i$ components yields:
+
+    $$B \hat i = B_m[\cos(\omega t)-{1\over2}\cos(\omega t-120^\circ)-{1\over2}\cos(\omega t-240^\circ)]$$
+
+    Applying trig identity $\cos(\alpha-\beta) = \cos\alpha\cos\beta+\sin\alpha\sin\beta$:
+
+    $$B \hat i = B_m[\cos(\omega t)-{1\over2}(-{1\over2}\cos(\omega t)+{\sqrt3\over2}\sin(\omega t))-{1\over2}(-{1\over2}\cos(\omega t)-{\sqrt3\over2}\sin(\omega t))]$$
+
+    Distributing constants and cancelling out $\sin(\omega t)$ terms yields:
+
+    $$B\hat i=B_m[1+{1\over4}+{1\over4}]\cos(\omega t) = 1.5B_m\cos(\omega t)$$
+
+    A similar derivation is performed for the $\hat j$ component showing that:
+
+    $$\vec B_{net}(t) = 1.5B_m\cos(\omega t)\hat i+1.5B_m\sin(\omega t)\hat j$$
+
+    The scalar magnitude is found via the Pythagorean theorem and identity: $\cos^2\theta + \sin^2\theta = 1$:
+
+    $$\lvert\vec B_{net}\rvert = \sqrt{B_x^2+B_y^2}$$
+
+    $$\lvert\vec B_{net}\rvert = \sqrt{(1.5B_m\cos(\omega t))^2+(1.5B_m\sin(\omega t))^2}$$
+
+    $$\lvert\vec B_{net}\rvert = \sqrt{2.25B_m^2(\cos^2(\omega t)+\sin^2(\omega t))}$$
+
+    $$\lvert\vec B_{net}\rvert = \sqrt{2.25B_m^2(1)} = 1.5B_m$$
+
