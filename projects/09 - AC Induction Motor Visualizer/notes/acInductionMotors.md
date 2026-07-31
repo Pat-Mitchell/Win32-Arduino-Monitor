@@ -30,33 +30,40 @@ Each individual coil can only produces a magnetic field that pulses back and for
 
 1. At $0^\circ$: Phase A peaks positively
 
-  - Currents: Phase A is at its maximum positive value. Phases B and C are both negative and at half-strength.
+    - Currents: Phase A is at its maximum positive value. Phases B and C are both negative and at half-strength.
 
-  - Fields: Phase A pulls the magnetic field strongly toward the $0^\circ$ physical axis. Phase B and C push weakly away from their respective physical axes.
+    - Fields: Phase A pulls the magnetic field strongly toward the $0^\circ$ physical axis. Phase B and C push weakly away from their respective physical axes.
 
-  - Net Vector: The net field points directly towards $0^\circ$.
+    - Net Vector: The net field points directly towards $0^\circ$.
 
 2. At $120^\circ$: Phase B peaks positively
 
-  - Currents: One-third of an electrical cycle later, Phase B reaches its maximum positive value. Phases A and C are at half-strength negatively.
+    - Currents: One-third of an electrical cycle later, Phase B reaches its maximum positive value. Phases A and C are at half-strength negatively.
 
-  - Fields: The primary magnetic pull shifts entirely over to the Phase B coil.
+    - Fields: The primary magnetic pull shifts entirely over to the Phase B coil.
 
-  - Net Vector: The net field smoothly swings around and now points toward $120^\circ$.
+    - Net Vector: The net field smoothly swings around and now points toward $120^\circ$.
 
 3. At $240^\circ$: Phase C peaks positively
 
-  - Currents: Phase C reaches its maximum positive value. Phase A and B drop to half-strength megative.
+    - Currents: Phase C reaches its maximum positive value. Phase A and B drop to half-strength megative.
 
-  - Fields: The primary magnetic pull is towards the Phase C coil.
+    - Fields: The primary magnetic pull is towards the Phase C coil.
 
-  - Net Vector: The total net field swings further and points directly towards $240^\circ$.
+    - Net Vector: The total net field swings further and points directly towards $240^\circ$.
 
 While individual fields constantly grow, shrink, and reverse direction, their trigonometric combination yields a mathematical constant. Using vector addition, if $B_m$ is the peak magnetic field of a single phase, the net magnetic field ($B_{net}$) at any given instant is always 1.5 times the maximum field of an individual coil:
 
-$$B_{net} = 1.5 \times B_m$$
+$$B_{net} = 1.5 \times B_m$$ [[^2]](#footnote-2)
 
 Because the magnitude never changes, the magnetic fields does not pulse or flicker. It glides in smooth, continuous circle at synchronous speed ($N_s$), which is dectated by the power supply frequency ($f$) and the number of stator magnetic poles ($P$).:
 
 $$N_s = {120 \times f \over P}$$
 
+[^2]: The time-varying magnitudes of the magnetic fields, oscillating at angular frquency $\omega$, are shifted $120^\circ$ in time:
+
+    $$B_A(t) = B_m \cos (\omega t)$$
+
+    $$B_B(t) = B_m \cos (\omega t - 120^\circ)$$
+
+    $$B_C(t) = B_m \cos (\omega t - 240^\circ)$$
