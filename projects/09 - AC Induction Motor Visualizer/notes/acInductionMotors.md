@@ -191,4 +191,132 @@ The drop in frequency from 60Hz at startup down to 1-2Hz at full loard drastical
 
 - Magnetic hysteresis [[^3]](#footnote-3) and eddy current losses inside the steel core of the rotor are heavily frequency-dependent. Because the rotor current drops to near-DC during normal operation, iron losses in the rotor become so tiny they are usually ignored in standard engineering efficiency calculations. 
 
-[^3]: Magnetic hysteresis is the lag between an applied external magnetic field and the resulting magnetization of a ferromagnetic materal
+[^3]: Magnetic hysteresis is the lag between an applied external magnetic field and the resulting magnetization of a ferromagnetic material. When iron or steel is magnetized and demagnetized, the internal magnetic domains do not instantly reset to zero when the outside force stops.
+
+## Torque-Speed Characteristics
+
+The torque-speed curve of an induction motor details the mechanical torque the motor can develop as it accelerates froma a complete standstill up to its synchronous speed. Because an induction motor behaves like a varying inductive loads as its slip changes, its torque output does not follow a straight line. It forms a distrinct, non-linear curve characterized by four primary operating points and regions.
+
+1. Starting Torque (Locked-Rotor): Starting torque is the mechanical turning force developed by the motor the exact instant power is applied to the stator windings while the rotor is at a complete standstill (0 RPM, Slip = 100%).
+
+    - The rotor frequency($f_r$) is at its maximum. This causes high inductive reactance ($X_r$) in the rotor bars.
+
+    - Although a massive inrush current flows into the motor at startup (typically 6-8 times the normal running current), the inductive lag creates a poor power factor. The magnetic field of the rotor is physically misaligned eith the stator's field, resulting in a starting torque of 100% to 200% of the motor's rated full-load torque.
+
+2. As the motor begins to rotate and accelerate, the speed increases, and the slip drops below 100%. **Pull-up torque** is the absolute lowest point of torque on the curve during acceleration.
+
+    - For many standard motors, as the rotor begins to accelerate, parasitic synchronous torques (caused by spatial harmonics or the physical alignment of the stator and rotor slot configurations) create a localized counter-torque.
+
+    - The motor must produce enough torque at this dip to exceed the static torque required by the conneted mechanical load. If the load's torque requirement is higher than the motor's pull-up torque, the motor will hand at this intermediate speed, fail to accelerate further, draw destructive inrush currents, and eventually trip its thermal overloads.
+
+3. As the motor clears the pull-up region, it enters a phase of rapid acceleration. **Breakdown torque** is the absolute maximum torque the motor can physically produce.
+
+    - This peak occurs at the exact physical speed where the dropping inductive reactance of the rotor ($X_r$) equals the internal electrical resistance of the rotor ($R_r$). Mathematically, this is the point of maximum power transfer to the rotor.
+
+    - Breakdown torque is usually high (ranging from 200% to 350% of the motor's rated full-load torque). It represents the motor's ultimate capacity to handle sudden, short-term mechanical overloads without stalling.
+
+4. Once the motor passes its breakdown peak, it drops down into its normal, highly efficient working zone. 
+
+    - Within this narrow operating range, slip is small (1% to 5%) and the rotor frequency has dropped to its optimized near-DC state. The torque-speed relationship behaves like a straight line.
+
+    - This is the **stable region** because the motor naturally self-regulates against changes in the mechanical load. Increasing a load increases slip, which increases relative motion, which induces higher voltage and surge in near-DC current, which outputs exactly enough additional torque to balance the heavier load
+
+If a mechanical jam forces the load torque to exceed the breakdown torque, the motor falls out of this linear zone. It enter the "unstable region," where slowing down decreases the available torque, leading to an immediate mechanical stall.
+
+### Torque Equation
+
+The simplified torque equation for a three-phase induction motor is a foundational engineering formula. It models how changing rotor speed changes the motr's mechanical torque output:
+
+$$T \propto {s \cdot R_2 \over R_2^2 + (s \cdot X_2)^2}$$
+
+(note: in classical machine design notation, the subscript "2" denotes the rotor parameters, replacing the general "r" subscript).
+
+This equation is derived directly from the priciple of maximum power transfer applied to an inductive circuit. 
+
+- The numerator $(s \cdot R_2)$:  
+    The numerator dictates the baseline capacity of the motor to generate an induced current that can align properly with the stator's magnetic field.
+
+    - $s$ (Slip): When the motor is running at no-load, slip is nearly zero. very little or no voltage is induced and torque, likewise, is very little or zero. As a load forces the rotor to slow down, slip increases linearly, drawing more power from the stator by inducing a higher voltage in the rotor bars.
+
+    - $R_2$ (Rotor Resistance): The physical resistance of the copper or aluminum bars embedded in the rotor core. It governs the active, in-phase current that produces the real mechanical work. In the numerator, a higher $R_2$ directly increases the initial torque output of the motor at high slip values (like startup).
+
+- The denominator ($R_2^2 + (s \cdot X_2)^2$):  
+    The denominator represents the square of the total rotor impedance ($Z_2^2$). It acts as an electrical bottleneck that limits how much current can physically flow through the rotor bars.
+
+    - $R_2^2$ (Rotor resistance squared): This acts as the steady, unchanging lower limit of rotor impedance. Because the physical copper bars do not change shape while spinning, this term remains constant regardless of the motor's speed.
+
+    - $(s \cdot X_2)^2$ (Variable inductive reactance squared): This is the most dynamic part of the equation. $X_2$ is the standstill inductive reactance (the rotor's internal inductance at 100% grid frequency). As the motor spins, the rotor frequency drops ($f_r = s \cdot f_s$). Because inductive reactance is frequency-dependent ($X_L = 2\pi f L$), it must be scaled by the slip.
+
+### Low Slip vs. High Slip Regions
+
+The behavior of the denominator explains why the torque-speed curve has its unique, curved shape, splitting normal motor operation into two distinct physical zones.
+
+**Low Slip (stable) Region**
+
+When the motor is running normally under its design load, the slip is tiny (1% to 5%). Because slip is so small, the term $(s \cdot X_2)^2$ becomes negligibly small compared to $R_2^2$ and the equation can be simplified to $T \propto {s \cdot R_2 \over R_2^2} \Rightarrow T \propto {s \over R_2}$. Physically at running speeds, the rotor current frequency is near-DC, meaning inductive lag completely vanishes. The rotor behaves like a pure resistor. In this zone, torque is directly proportional to slip. If the load increases, the motor slows down slightly, and torque increases in a predictably to match the load.
+
+**High Slip (Unstable/Startup) Region**
+
+When the motor first starts up or is heavily overloaded, the slip is large (50% to 100%). At high slip, the rotor frequency is high. The inductive reactance term $(s\cdot X_2)^2$ grows so massive that it completely dominates the fixed resistance ($R_2^2$). Mathematically, $R_2^2$ can be dropped from the denominator and simplify the equation to $T \propto {s\cdot R_2 \over(s\cdot X_2)^2} \Rightarrow T \propto {R_2\over s\cdot X_2^2}$. Physically, the rotor is highly inductive. Even though a massive current flows into the rotor bars, it lags severely behind the voltage. The maximum rotor magnetic poles do not line up with the maximum stator magnetic poles. In this zone, torque is inversely proportional to slip. This explains why starting torque is significantly lower than peak torque and why slowing down past the breakdown point causes the motor to stall.
+
+**The Breakdown Peak ($R_2 = s\cdot X_2$)
+
+The peak of the torque-speed curve (Breakdown Torque) occurs at the exact mathematical tipping point where the two terms in the denominator balance perfectly: $R_2 = s \cdot X_2$
+
+Physically, this is the exact speed where the rotor frequency has dropped low enough that its inductive lag no longer chokes the current, allowing the maximum possible transfer of electromagnetic power from the stator into the rotor. 
+
+When the mechanical load torque exceeds the motor's breakdown torque, the motor falls out of its self-regulating balance and enters sequence that leads to a mechanical stall:
+
+1. A sudden drop into the unstable region
+
+    Normally, an induction motor operates in its stable region where a slight decrease in speed causes a necessary increase in torque to match the load. The moment the load torque surpasses the peak breakdown torque point ($R_2 = s\cdot X_2$),  the motor crosses a dangerous thermodynamic boundary into the unstable region where slowing down causes the motor's torque output to decrease.
+
+2. Stall
+
+    Because the load is demanding more pulling force than the motor can physically generate, a rapid chain reaction occurs.
+
+    1. Deceleration: The heavy load acts as a severe brake, forcing the physical rotor speed ($N_r$) to plummet towards 0 RPM.
+
+    2. Slip skyrockets: As the rotor slows down, the slip rapidly climbs towards 100%.
+
+    3. Inductive reactance dominates: As slip climbs, the frequency of the current inside the rotor bars ($f_r = s\cdot f_s$) spikes from its normal 1-2Hz up toward the full grid frequency.
+
+    4. Torque collapse: According to the torque equation ($T\propto {R_2 \over s\cdot X_2^2}$), the massive spike in frequency cause sthe rotor's inductive reactance ($s\cdot X_2$) to balloon. This chokes off the active current and throws the rotor's magnetic field completely out of phase with the stator field. Torque plummets and the motor locks up at 0 RPM.
+
+3. Locked-Rotor Current
+
+    Once the motor has stalled, it is in a "locked-rotor" state. Because there is no longer any counter-electromotive force being generated by the rotor's rotation to oppose the incoming voltage, the motor effectively becomes a massive short circuited transformer.
+
+    The stator instantly begins drawing locked-rotor amperage (6 to 8 times higher than its normal full-load running current). A motor that normally draws 20 Amps under full load will suddenly pull 120 to 160 Amps while sitting still and humming loudly.
+
+4. Thermal Destruction
+
+    Electrical copper losses ($I^2R$) heat up a motor. Because the current has increased six-fold, the internal heat generation spikes by a factor of thirty-six ($i^2\Rightarrow6^2=36$). Because the rotor has stopped spinning, the internal shaft-mounted cooling fan is no longer spinning. The motor has zero airflow to dissipate the thermal surge. The temperature inside the stator slots rises to a level where the thin varnish insulation coating the copper windings melts or bakes dry and cracks.
+
+To keep the motor from catching fire or melting its windings when a stall occurs, modern industrial electronical systems rely on overload relays/thermal magnetic breakers that sense the LRA current spike. If current does not drop back down to normal running levels within a predefined window, the breaker trips the contactor and cuts line power to the motor. 
+
+If the motor is controlled by a variable frequency drive, the drive will actively monitor the slip. If it sees the torque demand hitting the breakdown threshold, it will automatically lower the stator frequency to decrease the slip, safely dropping the motor speed while maintaining maximum torque to pull through the jam without tripping.
+
+### Reducing Stator Voltage
+
+Reducing the voltage cupplied to the stator shifts the entire torque-speed curve downward because of a strict mathematical and physical rule: indection motor torque is directly proportional to the square of the stator voltage ($T\propto V_s^2$). This relationship is why simple coltage reduction is terrible for speed control under heavy loads and why Volts-per-Hertz ($V/f$) control is used in variable frequency drives instead.
+
+The fundamental motor torqu equation can be explanded to show its dependance on the stator supply coltage ($V_s$):
+
+$$T \propto {s \cdot R_2 \cdot V_s^2 \over R_2 ^ 2 + (s \cdot X_2)^2}$$
+
+- Stator voltage directly creates the stator's rotation magnetic flux ($\Phi_s \propto V_s$). This flux must then physically corss the air gap to induce voltage and subsequent current inside the rotor bars. The rotor current is directly proportional to the stator voltage ($I_2 \propto V_2$).
+
+- Because torque is the product of stator flux and rotor current ($T \propto \Phi_s \cdot I_2$), any drop in voltage cuts both terms.
+
+- Reducing the stator voltage by half, for example, drops the maximum available breakdown torque by a factor of four. It reduces to 25% of its original capacity. The stable operating region is shrunk and chances of stall increase.
+
+To change the speed of an induction motor safely and efficiently, the frequency of the electricity is altered because synchronous speed is directly tied to frequency ($N_S = {120f \over P}$).
+
+**The danger of dropping frequency alone**
+
+If a VFD lowers the frequency from 60Hz to 30Hz to slow a conveyor belt to half speed, but keeps the voltage at 460V, the $V/f$ ratio doubles. Physically, this means the alternating current is changing direction so slowly that the magnetic field has twice as much time to build up in the steel stator teeth during each electrical cycle. This pushes the steel core deep into magnetic saturation. The core can no longer contain the lines of flux, inductive reactiance pummets to near zero, and the motor draws a destructive wave of magnetizing current, melting the windings.
+
+To prevent core saturation while still allowing full speed control, a VFD uses a variable voltage variable frequency (VVVF) inverter. When the drive changes the frequency, it automatically shifts the voltage by the exact same proportion to keep the $v/f$ ratio constant.
+
+By lockign the $V/f$ ratio at a constant value, the VFD ensures that the magnetic flux inside the motor remains perfectly steady at its ideal, full design level across the entire speed spectrum. Because the magnetic flux is kept constant, the motor can produces its maximum rated breakdown torque at any speed, from a crawl up to full velocity. Instead of collapsing the torque curve downward, the VFD smoothly slides the enitre full-strength torque curve horizontally, giving high-torque speed control without any risk of stalling or overheating.
