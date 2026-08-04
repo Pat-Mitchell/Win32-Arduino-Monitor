@@ -135,7 +135,13 @@ void ACMotorApp::OnPaint(HDC hdc) {
   int iW = rcClient.right;
   int iH = rcClient.bottom;
 
-  FillRect(hdc, &rcClient, GetSysColorBrush(COLOR_WINDOW));
+  // FillRect(hdc, &rcClient, GetSysColorBrush(COLOR_WINDOW));
+
+  RECT rcControls = { 0, 0, iW, CONTROLS_H };
+  FillRect(hdc, &rcControls, GetSysColorBrush(COLOR_WINDOW));
+
+  RECT rcReadout = { 0, iH - READOUT_H, iW, iH };
+  FillRect(hdc, &rcReadout, GetSysColorBrush(COLOR_WINDOW));
 
   // Separator lines
   HPEN hSepPen = CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNSHADOW));
@@ -156,7 +162,7 @@ void ACMotorApp::OnPaint(HDC hdc) {
 
   // GDI Panels
   m_torquePanel.Draw(hdc, GetTorquePanelRect(), m_state);
-  m_fieldPanel.Draw(hdc, GetFieldPanelRect(), m_state, m_fTheta_rad);
+  m_fieldPanel.Draw(hdc, GetFieldPanelRect(), m_state, m_fTheta_rad, m_fAnimDir > 0.0f);
 }
 
 void ACMotorApp::OnTimer(int iTimerId) {

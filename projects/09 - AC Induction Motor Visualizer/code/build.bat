@@ -10,7 +10,7 @@ cd projects/09 - AC Induction Motor Visualizer/code
 echo === Building AC Induction Motor Visualizer ===
 g++ main.cpp ACMotorApp.cpp ^
   %WRAPPERS%/win32Wrappers/Window.cpp ^
-  -o ACInductionMotor.exe TorqueSpeedPanel.cpp ^
+  -o ACInductionMotor.exe TorqueSpeedPanel.cpp RotatingFieldPanel.cpp ^
   -mwindows -DUNICODE -D_UNICODE -lxinput -lcomctl32
   if %errorlevel% == 0 (
     echo Build Successful. 
