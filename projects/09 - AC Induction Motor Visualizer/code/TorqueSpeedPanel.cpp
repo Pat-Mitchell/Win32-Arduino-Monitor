@@ -61,21 +61,21 @@ void TorqueSpeedPanel::DrawKeyPoints(HDC hdc, const RECT& rcPlot, const MotorSta
   int iSy = MapY(s.fT_start, 0.0f, Y_MAX, rcPlot);
   DrawDot(hdc, iSx, iSy, iDotR, CLR_START);
   swprintf(buf, 48, L"T_start = %.2f", s.fT_start);
-  DrawLabel(hdc, iSx + 8, iSy - 18, buf, CLR_START);
+  DrawLabel(hdc, iSx + 10, iSy + 8, buf, CLR_START);
 
   // Breakdown torque
   int iBx = MapX(s.fNr_breakdown, 0.0f, s.fNs_rpm, rcPlot);
   int iBy = MapY(s.fT_breakdown, 0.0f, Y_MAX, rcPlot);
   DrawDot(hdc, iBx, iBy, iDotR, CLR_BREAK);
   swprintf(buf, 48, L"Breakdown (%.0f RPM)", s.fNr_breakdown);
-  DrawLabel(hdc, iBx - 60, iBy - 18, buf, CLR_BREAK);
+  DrawLabel(hdc, iBx - 60, iBy - 25, buf, CLR_BREAK);
 
   // Full-load point
   int iFx = MapX(s.fNr_fullload, 0.0f, s.fNs_rpm, rcPlot);
   int iFy = MapY(s.fT_fullload, 0.0f, Y_MAX, rcPlot);
   DrawDot(hdc, iFx, iFy, iDotR, CLR_FL);
   swprintf(buf, 48, L"Full load (%.0f RPM)", s.fNr_fullload);
-  DrawLabel(hdc, iFx + 8, iFy - 18, buf, CLR_FL);
+  DrawLabel(hdc, iFx - 140, iFy - 25, buf, CLR_FL);
 }
 
 void TorqueSpeedPanel::DrawDot(HDC hdc, int x, int y, int iR, COLORREF clr) {
