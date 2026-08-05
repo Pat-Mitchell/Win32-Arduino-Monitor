@@ -136,9 +136,9 @@ static void DrawArrowHead(HDC hdc, float fTipX, float fTipY, float fAngleRad, in
 }
 
 // public draw arrows
-void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr) {
+void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr, int iWeight = 1) {
   // Draw the stem line
-  HPEN hPen = CreatePen(PS_SOLID, 1, clr);
+  HPEN hPen = CreatePen(PS_SOLID, iWeight, clr);
   HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
 
   MoveToEx(hdc, iX1, iY1, NULL);
@@ -201,4 +201,12 @@ void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, flo
   }
 
   DrawArrowHead(hdc, (float)iEndX, (float)iEndY, fTangentAngle, iHeadSize, clr);
+}
+
+void DrawLabel(HDC hdc, int x, int y, const wchar_t* sz, COLORREF clr) {
+  COLORREF clrOld = SetTextColor(hdc, clr);
+  int iBkOld = SetBkMode(hdc, TRANSPARENT);
+  TextOut(hdc, x, y, sz, (int)wcslen(sz));
+  SetTextColor(hdc, clrOld);
+  SetBkMode(hdc, iBkOld);
 }

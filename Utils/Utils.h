@@ -80,7 +80,7 @@ BOOL ShowSaveDialog(HWND hwnd_owner, const wchar_t* szFilter, const wchar_t* szD
 /// @param iY2 Arrow tip Y in pixels
 /// @param iHeadSize Length of the arrowhead barbs in pixels
 /// @param clr Arrow color
-void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr);
+void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLORREF clr, int iWeight);
 
 /// @brief Draws a circular arc with an arrowhead at the end.
 ///   The head is tangent to the arc at the endpoint so it reads
@@ -94,3 +94,11 @@ void DrawArrow(HDC hdc, int iX1, int iY1, int iX2, int iY2, int iHeadSize, COLOR
 /// @param iHeadSize Length of the arrowhead barbs in pixels
 /// @param clr Arrow color
 void DrawArcArrow(HDC hdc, int iCX, int iCY, int iRadius, float fStartAngle, float fSweepAngle, int iHeadSize, COLORREF clr);
+
+/// @brief Draws text at specified (x, y) coordinates
+/// @param hdc Device context to draw into
+/// @param x Start X in pixels
+/// @param y Start Y in pixels
+/// @param sz Text to print
+/// @param clr Text color
+void DrawLabel(HDC hdc, int x, int y, const wchar_t* sz, COLORREF clr);
