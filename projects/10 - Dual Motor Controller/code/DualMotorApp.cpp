@@ -68,11 +68,14 @@ void DualMotorApp::OnCreate() {
   ScanComPorts(cmb_port);
 
   // Connect/Disconnect
-  btn_connect = new Button(hwnd_self, L"Connect", ID_BTN_CONNECT, Layout::STRIP_PAD + 224, iY, 90, 22);
+  btn_connect = new Button(hwnd_self, L"Connect", ID_BTN_CONNECT, Layout::STRIP_PAD + 138, iY, 90, 22);
   btn_disc = new Button(hwnd_self, L"Disconnect", ID_BTN_DISCONNECT, Layout::STRIP_PAD + 224, iY, 90, 22);
   btn_disc->Disable();
 
   // Status Label
+  lbl_status = new Label(hwnd_self, L"Status: Disconnected", Layout::STRIP_PAD + 322, iY + 2, 220, 20);
+
+  // Deadzone strip
   const int iDzY = Layout::DZ_STRIP_TOP + Layout::STRIP_PAD;
   lbl_deadzone_txt = new Label(hwnd_self, L"Deadzone:", Layout::STRIP_PAD, iDzY + 2, Layout::DZ_LABEL_W, 20);
   trk_deadzone = new Trackbar(hwnd_self, ID_TRK_DEADZONE, Layout::DZ_SLIDER_X, iDzY, Layout::DZ_SLIDER_W, 24, 0, 32787);
@@ -171,10 +174,10 @@ int DualMotorApp::StickToPWM(SHORT sStickY) {
 
   // XInputController already zeroes values inside the deadzone
   // non-zero values here are outside the deadzone
-  // Remap[1,32767] -> [PWM_MIN, PWM_MAX]
+  // Remap[1,32787] -> [PWM_MIN, PWM_MAX]
   int iAbs = sStickY < 0 ? -sStickY : sStickY;
   int iSign = sStickY > 0 ? 1 : -1;
-  float fNorm = (float)iAbs / 32767.0f;
+  float fNorm = (float)iAbs / 32787.0f;
   int iPWM = PWM::MIN_SPEED + (int)(fNorm * (PWM::MAX_SPEED - PWM::MIN_SPEED));
 
   // Clamp to valid range

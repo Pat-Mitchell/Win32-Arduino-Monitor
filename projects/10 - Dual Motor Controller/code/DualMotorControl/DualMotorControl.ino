@@ -69,7 +69,7 @@ void setup() {
 
   // initial safe state -> both motors stopped
   applyMotor(PIN_M1_IN1, PIN_M1_IN2, PIN_M1_ENA, 0);
-  applyMotor(PIN_M2_IN3, PIN_M2_IN3, PIN_M2_ENB, 0);
+  applyMotor(PIN_M2_IN3, PIN_M2_IN4, PIN_M2_ENB, 0);
 
   Serial.begin(9600);
 }
@@ -113,7 +113,7 @@ void applyMotor(int iPin_IN_A, int iPin_IN_B, int iPin_EN, int iSpeed) {
   } else {
     digitalWrite(iPin_IN_A, LOW);
     digitalWrite(iPin_IN_B, HIGH);
-    analogWrite(iPin_EN, iSpeed);
+    analogWrite(iPin_EN, -iSpeed);
   }
 }
 
