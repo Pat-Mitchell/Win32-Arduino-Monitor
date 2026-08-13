@@ -107,3 +107,131 @@ The virtual short/ground simplifies circuit analysis by allowing the use of Kirc
 6. Solve for Closed-Loop Gain ($A_v$): $$A_v = {V_{out} \over V_{in}} = -{R_{f} \over R_{in}}$$
 
 Wihout the concept of a virtual ground stabilizing $V_-$ at 0 V and blocking input current, deriving this clean, predictable gain equation would be mathematically unfeasible.
+
+Because the output of an op-amp acts like a controllable voltage source, current can either flow out of or into the $V_{out}$ terminal depending on whether the op-amp is sourcing or sinking current. The direction of current is entirely determined by the voltage at $V_{out}$ relative to the rest of the circuit.
+
+### Sourcing Current (flowing OUT)
+
+When the op-amp sets $V_{out}$ to a voltage higher than the connected load or feedback network, current flows out of the $V_{out}$ terminal.
+
+### Sinking Current (flowing IN)
+
+When the op-amp set$V_{out} to a voltage lower than the connected load or feedback network, current flows into the $V{out}$ terminal.
+
+### Example 
+
+If $V_{in} = +2V$, the output will be negative ($V_{out} = -2V$).
+
+Current flows from the inout source, though $R_1$ to the virtual ground (0V). Because it cannot enter the op-amp input pin, that same current continues through $R_f$ and flows into the $V_{out}$ terminal (-2V). The op-amp is **sinking** current.
+
+Flipping the input to a negative ($V_{in} = -2V$), the output becomes positive ($V_{out} = +2V$). Current reverses direction and flows out of $V_{out}$, through $R_f$, past the virtual ground, and out through $R_1$. The op-amp is **sourcing** current.
+
+### Virtual ground enables gain equations.
+
+Virtual ground enables gain equations by decoupling the input and output sections of a circuit into a single, predictable nodal equation. By forcing the inverting terminal to a known voltage, 0V, and blocking current from entering the op-amp, it reduces coplex internal transistor physics into basic algebra.
+
+In nodal analysis, every junction point (node) introduces an unknown voltage variable that must be solved for. Without virtual ground, the exact fluctuating voltage at the $V_-$ pin must be calculated instead of the guaranteed 0V. The unknown variable is eliminated and acts as a fixed anchor point for Ohm's Law. Additionally, according to Kirchhoff's current law, the sum of currents entering a node must equal the sum of currents leaving it. Because the op-amp has infinite input impedance, no current can bleed off into the op-amp itself.
+
+With open-loop gain, a real op-amp's internal gain changes with temperature, age, and manufacturing batchs. Trying to calculate gain using the true open-loop value uses the equation:
+
+$$A_v = {-R_f / R_{in} \over 1 + {1 + R_f / R_{in} \over A_{OL}}}$$
+
+Because the high open-loop gain enforces a virtual ground, it can be assumed $A_OL$ approaches infinity ($\infty$). As $A_{OL} \rightarrow \infty$, the entire denominator reduces to 1. The internal imperfections of the silicon disappear, leaving behind only the clean textbook ratio of external components:
+
+$$A_v = -{R_f \over R_{in}}$$
+
+### The See-Saw Analogy
+
+Think of the virtual ground as a rigid pivot point on a see-saw.
+
+       V_in (Input)                              V_out (Output)
+           \                                         /
+            \                                       /
+             \                                     /
+    ----------[=========]=======▲=======[=========]----------
+              R_1          Virtual Ground     R_f
+                              (0V Fixed)
+
+Because the pivot point is completely locked inplace at 0V by the negative feedback loop, pushing down on the left side ($V_{in}$) mechanically forces the right side ($V_{out}$) to move up. The exact ratio of how high the right side goes depends on the lengths of the two arms ($R{1}$ and $R_f$).
+
+## Inverting Amplifier Configuration
+
+The inverting amplifier configuration amplifies an incoming AC or DC signal while flipping its polarity by $180^\circ$ (inverting it). The circuit routes signals along two primary paths meeting at the inverting node. The input voltage ($V_{in}$) connects to the inverting input ($V_-$) through an input resistor ($R_{in}$), a feedback resistor ($R_f$) connects the output ($V_{out}$) back to the same inverting input ($V_-$), and the non-inverting input ($V_+$) connects directly to a stable reference voltage (typically system ground (0V)).
+
+The closed-loop voltage gain ($A_v$) represents the ratio of output voltage to input voltage:
+
+$$A_v = {V_{out} \over V_{in}} = -{R_f \over R_{in}}$$
+
+The negative sign indicates the inversion of the signal. A +1V DC input outputs a negative voltage. A sine wave input's output is rotated $180^\circ$.
+
+The op-amp's internal open-loop gain is completely omitted. The final gain relies entirely on the ratio of the two external resistors.
+
+While an ideal op-amp chip has infinite input impedance, the inverting amplifier circuit, as a whole, does not. When the input signal looks into the circuit, it sees the input resistor ($R_{in}$) connected directly to a virtual 0V point. Therefore, the input inpedance of the entire circuit is qual to $R_{in}$: $Z_{in} = R_{in}$.
+
+### Example
+
+Using $R_{in} = 10 \text k \Omega$ and $R_f = 100 \text k \Omega$,
+
+Gain ($A_v$) = $-{100 \text k \Omega \over 10 \text k \Omega} = -10$
+
+Input Impedance = $Z_{in} = 10 \text k \Omega$.
+
+Feeding a +0.5 V DC signal into this circuit, the output will stabalize at -5.0 V DC. The source driving this circuit must be capable of driving a $10 \text k \Omega$ load without dropping its voltage.[[^4]](#footnote-4)
+
+[^4]: The limits on operation amplifier amplication are dictated by power supply rails, Gain-Bandwidth Product (GBP), and DC offset errors. Nothings stops the design of a circuit with a closed-loop voltage gain of 1000 using a 5V single supply, but the input signal amplitude must be less than 5 mV, otherwise the output will clip and saturate against the power rails. An op-amp cannot output more voltage than it receives from its power supply. In this example, an input signal exceeding 5mV peak-to-peak will have a flattened (clipped) output at the rails, turning a sine wave into a distorted, square-like wave.
+
+## Non-Inverting Amplifier Configuration
+
+The non-inverting amplifier configuration amplifies an electrical signal without flipping its polarity while maintaining an exceptionally high input impedance that prevents source loading. Unline the inverting configuration, this circuit keeps the output signal perfectly in phase with the input signal.
+
+The architecture isolates the input signal from the feedback loop. The input voltage ($V_{in}$) connects directly to the non-inverting input ($V_+$). A voltage divider consisting of a feedback resistor ($R_f$) and an input resistor ($R_in$) connects from the output ($V_{out}$) back to the inverting input ($V_-$). The bottom of the input resistor ($R_{in}$) connects directly to system ground (0V).
+
+The closed-loop voltage gain ($A_v$) represents the exact scaling factor of the amplifier:
+
+$$A_v = {V_{out} \over V_{in}} = 1 + {R_f \over R_{in}}$$
+
+The gain value is always positive and not inverted. A positive input produces a positive output. Because of the "1 +" in the formula, the voltage gain can never be less than 1. It cannot attenuate a signal.
+
+The primary advantage of the non-inverting amplifier over the inverting configuration is its input impedance. The input signal connects straight to the $V_+$ pin. It bypasses the external resistor network entirely. It looks directly into teh internal transistors of the op-amp. The circuit draws virtually zero current from the source and can amplify fragile signals from high-impedance sources like piezo sensores or guitar pickups without dropping the signal voltage.
+
+### Unity Gain Buffer/Voltage Follower
+
+If both resistors are removed and replaced with a wire going straight from the inverting terminal to $V_out$ without a connection to ground, the op-amp is in a voltage follower configuration. Setting $R_{in} = \infty$ and $R_f = 0$ to reflect the change from non-inverting to voltage follower yields the equation:
+
+$$A_v = 1 + {0 \over \infty} = 1$$
+
+The output voltage perfectly mimics the input voltage ($V_{out} = V_{in}$). Zero voltage amplification is providedd, but maximizes current amplification. It acts as an isolation buffer between a weak signal source and a heavy load.
+
+## Gain-Bandwidth Product (GBW)
+
+The gain-bandwidth product is a constant parameter for voltage-feedback op-amps that defines the fundamental trade-off between amplificiation and operating frequency. Because the product of the closed-loop gain and the upper cutoff frequency is fixed, the circuit can either have high gain or high frequency respose, but never both at the same time.
+
+The mathematical principle of GBW is:
+
+$$\text {Closed-Loop Gain} (A_v) \times \text {Bandwidth} (f_c) = \text {GBW} (\text {Constant})$$
+
+The maximum usable frequency (bandwidth) is found by looking at the op-amp's datasheet for the GBW specification and dividing the GBW by the targeted closed-loop gain:
+
+$$\text {Bandwidth} (f_c) = {\text {GBW} \over A_v}$$
+
+### LM358 Performance ($\text {GBW} \approx 1 \text {MHz}$)
+
+The LM358 op-amp serves as an exmple of the mathematical trade-off:
+
+- At Unity Gain ($A_v = 1$): The usable bandwidth is the full 1 MHz.
+
+- At Moderate Gain ($A_v = 10$): The bandwidth drops significantly: $f_c = {1,000,000 \text {Hz} \over 10} = 100 \text kHz$
+
+- At High Gain ($A_v = 100$): The bandwidth shrinks to a narrow window: $f_c = {1,000,000 \text {Hz} \over 100} = 10 \text kHz$
+
+The internal compensation capacitor is the reason for why increasing gain reduces frequency range. The capacitor acts as a low-pass filter causing the op-amp's massive internal open-loop gain to drop off (roll-off) at a stead rate of -20 dB per decade starting at a very low frequency (often just a few hertz). The closed-loop gain of the circuit remains flat across lower frequencies. However, it connot exceed the op-amp's native open-loop gain curve.
+
+### TL071 is better for Audio than LM358
+
+The TL071 features a GBW of approximately 3 MHz, making it vasatly superior to the LM258 (1MHz) for auidio applications. The standard human hearing range spans up to 20 kHz. For high-fidelity audio, an amplifier must remain completely flat up to 20 kHz with no signal attenuation or phase distortion. A LM358 configured for a standard audio preamp gain of 100 restricts the bandwidth to 10kHz. It will completely roll off the top half of the audio spectrum (treble), resulting in muffled, distorted sound.
+
+Configuring a TL071 for the same gain of 100 yields three times the bandwidth:
+
+$$f_c = {3,000,000 \text {Hz} \over 100} = 30 \text {kHz}$$
+
+Because 30 kHz is safely beyond the 20 kHz human hearing limit, the TL071 passes the entire audio spectrum with absolute clarity and zero attenuation.
