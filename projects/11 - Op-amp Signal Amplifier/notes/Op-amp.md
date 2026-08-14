@@ -116,7 +116,7 @@ When the op-amp sets $V_{out}$ to a voltage higher than the connected load or fe
 
 ### Sinking Current (flowing IN)
 
-When the op-amp set$V_{out} to a voltage lower than the connected load or feedback network, current flows into the $V{out}$ terminal.
+When the op-amp set $V_{out}$ to a voltage lower than the connected load or feedback network, current flows into the $V_{out}$ terminal.
 
 ### Example 
 
