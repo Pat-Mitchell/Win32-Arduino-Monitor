@@ -42,7 +42,7 @@ In order to work properly, the decoupling capacitor must be placed as physically
 
 ### Headroom
 
-The LM358 is not a rail-to-tail op-amp. While its output can swing completely down to the negative rail (0V), it upeer internal transistors require headroom. It cannot push past rought $V_{cc} - 1.5 \text V$. With the Arduino's 5V rail, the maximum output voltage is only 3.5V. Using the 2.5V bias point, the signal can only swing 1.0V up (2.5V to 3.5V) before hard-clipping. However, it can swing 2.5V down (2.5V to 0V).
+The LM358 is not a rail-to-rail op-amp. While its output can swing completely down to the negative rail (0V), it upeer internal transistors require headroom. It cannot push past rought $V_{cc} - 1.5 \text V$. With the Arduino's 5V rail, the maximum output voltage is only 3.5V. Using the 2.5V bias point, the signal can only swing 1.0V up (2.5V to 3.5V) before hard-clipping. However, it can swing 2.5V down (2.5V to 0V).
 
 ### Slew Rate
 
@@ -67,8 +67,28 @@ The TL071's superior speed and fidelity would be mostly unusable on a single 5V 
 | Output swing at 5V | 0V to 3.5V | Locks up/Saturated | The TL071 output will slam into a rail and fressze because it lacks dual voltage tracks. | 
 | Slew Rate | 0.3 V/µs (slow) | 13-20 V/µs (fast) | The TL071 wins on speed, but only if given a proper $\pm 9V$ or $\pm 15V$ power supply. | 
 
-## Fixing the headroom clipping issue after discovering the limitations of the LM558
+## Fixing the headroom clipping issue after discovering the limitations of the L358
 
 The 2.5V bias needs to be 1.75V for a midpoint between 0V and 3.5V. The resistors in the voltage divider need to have a ratio of approximately 1.857 to give the desired voltage. Resistor choices are 18kΩ and 10 kΩ for a bias of 1.78V or a more accurate 22kΩ and 12kΩ for a bias of 1.76V.
 
 The new values the arduino ADC will read at a baseline with no signal is 358 to 364.
+
+## ADC fast sampling
+
+Arduino ADC fast samping allows for the bypass of the standard conservative speed limits of the microcontroller to capture rapidly chaning signals like audio or low-frequency radio waves. By modifying the hardware ADCSRA (ADC Control and Status Register A) register, the division factor (prescaler) that dictates how fast the ADC clocks its cycles can be changed.
+
+By default, the prescaler is set to /128 (~9.6 kHz). It balances noise rejection with speed. It yields an ADC clock of 125 kHz, taking roughly 104 microseconds per sample. Pushing the hardware to /16, /8, or /4 pushes the accuracy limits of the hardware with faster clockrates. For basic audio processing, /4 (~307.7 kHz) results in noisey data as the register does not have time to settle and bit resolution drops below 10 bits.
+
+Dropping the prescaler below 32 shows the limits of the Arduino hardware. The internal sampling capacitor has significantly less time to charge up and the effective number of bits drops (only 7-8 stable bits of resolution instead of the full 10).
+
+### Nyquist limit
+
+To avoid aliasing (where a high-frequency signal masquades as a lower frequncy), the sampling rate must be at least double the highest frequency component of the signal. I.e. to capture a 20 kHz audio frequency, the sampling rate must be above 40 kHz. Ideally, 10 to 20 samples per period provide enough resolution to cleanly visualize, measure peak to peak voltages, or execute accurate fast fourier transforms without severe distortion.
+
+## Oscilloscope Trigger
+
+An oscilloscope trigger actls like a camera shutter synchronized to a moving object. A fast-moving electrical signal looks like an unreadable blur of overlapping lines without it. Conversely, an untriggered display rolls continously across the screen from left to right to graph voltage over time. 
+
+Triggers forces the oscilloscope to wait until the signal meets a certain condition before it draws the data. This ensures that every frame of data appears in phase and frozen in place on the screen. Typically trigger types are rising edge where the scope waits until the signal crosses a designated voltage threshold while moving upward or falling edges where the scope waits until the signal crossed a designated threshold while moving downward.
+
+With old analog oscilloscopes, a trigger could only show what happed after the trigger eveny occured. Modern digital storage oscilloscopes continously stream data into a memory buffer. When the trigger event happes, the scope displays a pre-trigger buffer that shows data from before the trigger event occurs.
