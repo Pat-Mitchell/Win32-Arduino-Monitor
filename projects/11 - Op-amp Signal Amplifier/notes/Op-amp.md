@@ -72,7 +72,7 @@ Positive feedback destabalizes the system, pushing the output to its limits by r
 
 A virtual ground in an op-amp is a node that stays at zero volts without a physical connection to a real ground. This happens because of very high open-loop gain, negative feedback, and a grounded non-inverting input.
 
-An op-amp naturally amplifies the difference between its two inputs ($V_+ - V_-$) buy its open-loop gain ($A_{OL}$). The fundamental equation for an op-amp is:
+An op-amp naturally amplifies the difference between its two inputs ($V_+ - V_-$) by its open-loop gain ($A_{OL}$). The fundamental equation for an op-amp is:
 
 $$V_{out} = A_{OL} \times (V_+ - V_-)$$
 
@@ -80,7 +80,7 @@ Rearranging the equation to solve for the differential input gives:
 
 $$V_+ - V_- = {V_{out} \over A_{OL}}$$
 
-In real-world op-amps, $A_{OL}$ is massive (100,000 to 1,000,000 or more), while $V_out$ is strictly limited by the power supply rails. Because the small output voltage is divided by the colossal open-loop gain, the difference ($V_+ - V_-$) is forced to an incredibly small value (effectively zero):
+In real-world op-amps, $A_{OL}$ is massive (100,000 to 1,000,000 or more), while $V_{out}$ is strictly limited by the power supply rails. Because the small output voltage is divided by the colossal open-loop gain, the difference ($V_+ - V_-$) is forced to an incredibly small value (effectively zero):
 
 $$V_+ - V_- \approx {5 \text {V} \over 100,000} = 0.00005 \text V \approx 0 \text V$$
 
@@ -152,7 +152,7 @@ Think of the virtual ground as a rigid pivot point on a see-saw.
               R_1          Virtual Ground     R_f
                               (0V Fixed)
 
-Because the pivot point is completely locked inplace at 0V by the negative feedback loop, pushing down on the left side ($V_{in}$) mechanically forces the right side ($V_{out}$) to move up. The exact ratio of how high the right side goes depends on the lengths of the two arms ($R{1}$ and $R_f$).
+Because the pivot point is completely locked inplace at 0V by the negative feedback loop, pushing down on the left side ($V_{in}$) mechanically forces the right side ($V_{out}$) to move up. The exact ratio of how high the right side goes depends on the lengths of the two arms ($R_{in}$ and $R_f$).
 
 ## Inverting Amplifier Configuration
 
@@ -184,7 +184,7 @@ Feeding a +0.5 V DC signal into this circuit, the output will stabalize at -5.0 
 
 The non-inverting amplifier configuration amplifies an electrical signal without flipping its polarity while maintaining an exceptionally high input impedance that prevents source loading. Unline the inverting configuration, this circuit keeps the output signal perfectly in phase with the input signal.
 
-The architecture isolates the input signal from the feedback loop. The input voltage ($V_{in}$) connects directly to the non-inverting input ($V_+$). A voltage divider consisting of a feedback resistor ($R_f$) and an input resistor ($R_in$) connects from the output ($V_{out}$) back to the inverting input ($V_-$). The bottom of the input resistor ($R_{in}$) connects directly to system ground (0V).
+The architecture isolates the input signal from the feedback loop. The input voltage ($V_{in}$) connects directly to the non-inverting input ($V_+$). A voltage divider consisting of a feedback resistor ($R_f$) and an input resistor ($R_{in}$) connects from the output ($V_{out}$) back to the inverting input ($V_-$). The bottom of the input resistor ($R_{in}$) connects directly to system ground (0V).
 
 The closed-loop voltage gain ($A_v$) represents the exact scaling factor of the amplifier:
 
@@ -228,7 +228,7 @@ The internal compensation capacitor is the reason for why increasing gain reduce
 
 ### TL071 is better for Audio than LM358
 
-The TL071 features a GBW of approximately 3 MHz, making it vasatly superior to the LM258 (1MHz) for auidio applications. The standard human hearing range spans up to 20 kHz. For high-fidelity audio, an amplifier must remain completely flat up to 20 kHz with no signal attenuation or phase distortion. A LM358 configured for a standard audio preamp gain of 100 restricts the bandwidth to 10kHz. It will completely roll off the top half of the audio spectrum (treble), resulting in muffled, distorted sound.
+The TL071 features a GBW of approximately 3 MHz, making it vasatly superior to the LM358 (1MHz) for auidio applications. The standard human hearing range spans up to 20 kHz. For high-fidelity audio, an amplifier must remain completely flat up to 20 kHz with no signal attenuation or phase distortion. A LM358 configured for a standard audio preamp gain of 100 restricts the bandwidth to 10kHz. It will completely roll off the top half of the audio spectrum (treble), resulting in muffled, distorted sound.
 
 Configuring a TL071 for the same gain of 100 yields three times the bandwidth:
 
