@@ -86,6 +86,8 @@ A bonded foil strain gauge consists of three main layers:
 
 3. Solder Pads: The contact points where the foil thickens so lead wires and be connected into a circuit.
 
+![Foil Strain Gauge](strainGauge.png)
+
 The grid/zigzag pattern's purpose is to run the thin wire back and forth in parallel lines along the primary axis of strain to maximize the length of metal subjected to deformation. The wire is thicker at the ends to minimize the gauge's sensitivity to transverse strain.
 
 ### Resistance Change
