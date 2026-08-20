@@ -15,8 +15,8 @@ const int iPinSignal = A0;
 // Adjustable vis serial commands
 // ────── ⋆⋅☆⋅⋆ ────────
 int iSamples = 256; // Samples per frame (64-512)
-int iTrigLevel = 360; // ADC trigger threshold (0-716, 360 = ~1.76V)
-bool bTrigAuto = true; // TRUE = free-run, FLASE = edge triggered
+int iTrigLevel = 360; // ADC trigger threshold (0-716, 360 = ~1.75V)
+bool bTrigAuto = true; // TRUE = free-run, FALSE = edge triggered
 bool bRisingEdge = true; // TRUE = rising edge, FALSE = falling edge
 float fV_ref = 5.0f; // Actual VCC updated via measure VCC
 float fGain = 10.0f; // Hardware op-amp gain
@@ -54,6 +54,7 @@ float measureVCC() {
   ADMUX = _BV(REFS0);
   delay(2);
   ADCSRA = prevADCSRA;
+  return 1125300.0f / lRaw / 1000.0f; 
 }
 
 /// @brief Sets ADC prescaler to /16 for ~76kHz sample rate.
@@ -141,7 +142,7 @@ void sendFrame(bool bTriggered) {
   Serial.print(fV_ref, 3);
   Serial.print(",GAIN:");
   Serial.print((int)fGain);
-  Serial.print(",Trig:");
+  Serial.print(",TRIG:");
   Serial.print(iTrigLevel);
   Serial.print(",TRIG_OK:");
   Serial.println(bTriggered ? 1 : 0);
@@ -181,7 +182,7 @@ void parseCommand() {
 
   if(strCmd.startsWith("SAMPLES:")) {
     int iVal = strCmd.substring(8).toInt();
-    if(iVal > 64 && iVal <= MAX_SAMPLES) {
+    if(iVal >= 64 && iVal <= MAX_SAMPLES) {
       iSamples = iVal;
       Serial.print("SAMPLES:");
       Serial.println(iSamples);
