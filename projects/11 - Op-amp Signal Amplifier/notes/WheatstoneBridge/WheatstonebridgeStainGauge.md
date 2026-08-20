@@ -116,3 +116,44 @@ The gauge factor is the measure of how sensitive a gauge is or the ratio of the 
 $$GF = {\Delta R / R_{nominal} \over \epsilon}$$
 
 For most metallic foil gauges (like constantan), the gauge factor is approximately 2.0. This is actually a low sensitivity, meaning that stretching the gauge by 1% of it's total length ($\epsilon = 0.01$), the resistance changes by 2%. The change in resistance is usually a tiny fraction of a single ohm, which is why a wheatstone bridge and op-amp is required to convert the change into a measurable differential voltage.
+
+### Nominal Resistance
+
+The nominal resistance ($R{nominal}$) is the baseline resistance of the gauge when it is sitting flat with zero strain applied to it. The industry standards are 120Ω, 350Ω, and 1000Ω. 
+
+If the baseline resistance is too low, the resistance of the copper lead wires (and the solder joints) become a significant percentage of the total circuit resistance. Temperature changes in the room would change the lead wire resistance and complately drown out the tiny micro-ohm changes from the strain on the material.
+
+If the resistance is very high, the gauge acts like an antenna and becomes highly susceptible to electromagnetic noise in the room (like the 60Hz hum from overhead lights).
+
+In a Wheatstone bridge, there is a constant excitation voltage running thought the gauge. $P = V^2 / R$. if $R$ is too low, the gauge dissipates a lot of power as heat. Because the foil is microscopic, it will wuickly heat up the material underneath it, causing localized thermal expansion, which the gauge will read as mechanical strain.
+
+The 120Ω is developed as the "Goldilocks" compromise for most structural metals: high enough to minimize lead wire errors, low enough to avoid electrical noise, and manageable enough for heat dissipation if the excitation voltage is kept relatively low.
+
+## Quarter bridge configuration 
+
+A Wheatstone bridge where only one of the four arms is active (the strain gauge) while the other three are fixed references is a quarter bridge. The bridge is two voltage dividers sitting in parallel:
+- Left side: Resistors $R_1$ (top) and $R_2$ (bottom).
+- Right side: Reisistors $R_3$ (top) and $R_4$ (bottom, the strain gauge).
+
+The differential output voltage ($V_{out}) across the middle is the difference between the two dividers:
+
+$$V_{out} = V_{ex} \cdot ({R_4 \over R_3 + R_4} - {R_2 \over R_1 + R_2})$$
+
+### The theoretical bridge (Perfect $120\Omega$ Resistors)
+
+In a purely theoretical scenario with three fixed resistors ($R_1, R_2, R_3$) and the unstrained gauge ($R_4$) are exactly 120Ω, all four arms are equal in an unloaded state. Both voltage dividers split the 5V (Arduino $V_cc$) excitation in half:
+
+$$V_{out} = 5.0 \cdot ({120 \over 120 + 120} - {120 \over 120 + 120}) = 5.0 \cdot (0.5 - 0.5) = 0.0V$$
+
+This is the theoretical perfectly balanced bridge. When the op-amp applies its 100x gain, the output is still 0.0V.
+
+In a strained state (using 500 microstrain or $\epsilon = 0.0005$ and a GF of 2.0), the change in gauge resistance ($\Delta R$) is:
+
+$$\Delta R = R_{nominal} \cdot GF \cdot \epsilon = 120 \cdot 2.0 \cdot 0.0005 = 0.12 \Omega$$
+
+The strained gauge is now $120.12\Omega$. The bridge output becomes:
+
+$$V_{out} = 5.0 \cdot ({120.12 \over 120 + 120.12} - 0.5) = 5.0 \cdot (0.50025 - 0.5) = 0.00125 \text {V (or 1.25 mV)}$$
+
+### The realistic bridge (5% Tolerance resistors)
+
