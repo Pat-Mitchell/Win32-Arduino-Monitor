@@ -18,7 +18,7 @@ int iSamples = 256; // Samples per frame (64-512)
 int iTrigLevel = 360; // ADC trigger threshold (0-716, 360 = ~1.76V)
 bool bTrigAuto = true; // TRUE = free-run, FLASE = edge triggered
 bool bRisingEdge = true; // TRUE = rising edge, FALSE = falling edge
-float fV_ref = 5.0f // Actual VCC updated via measure VCC
+float fV_ref = 5.0f; // Actual VCC updated via measure VCC
 float fGain = 10.0f; // Hardware op-amp gain
 
 // ────── ⋆⋅☆⋅⋆ ────────
@@ -53,7 +53,7 @@ float measureVCC() {
   // Restore ADMUX to A0 and original prescaler
   ADMUX = _BV(REFS0);
   delay(2);
-  ADCSRA = revADCSRA;
+  ADCSRA = prevADCSRA;
 }
 
 /// @brief Sets ADC prescaler to /16 for ~76kHz sample rate.
@@ -112,7 +112,7 @@ bool waitForTrigger() {
     }
     // Phase 2: Wait for signal to cross downward
     while(analogRead(iPinSignal) > iTrigLevel) {
-      if(millis() - ulStart > uTimeout_ms) {
+      if(millis() - ulStart > ulTimeout_ms) {
         return false;
       }
     }
@@ -156,23 +156,103 @@ void sendFrame(bool bTriggered) {
   Serial.println();
 }
 
+// ────── ⋆⋅☆⋅⋆ ────────
+// Command handling
+// ────── ⋆⋅☆⋅⋆ ────────
 
+/// @brief Reads and dispatches one command from Serial
+///   Commands:
+///     SAMPLES:n   (set frame size (64-512))
+///     TRIG:n      (set trigger level ADC count (0 - 1023))
+///     TRIG:AUTO   (free-run mode (no edge wait))
+///     TRIG:RISE   (Rising edge trigger)
+///     TRIG:FALL   (Falling edge trigger)
+///     GAIN:n      (update hardware gain value for display scale)
+///     MEASURE_VCC (remeasure and report VCC)
+///
+/// @return void
+void parseCommand() {
+  if(Serial.available() == 0) {
+    return;
+  }
 
+  String strCmd = Serial.readStringUntil('\n');
+  strCmd.trim();
 
+  if(strCmd.startsWith("SAMPLES:")) {
+    int iVal = strCmd.substring(8).toInt();
+    if(iVal > 64 && iVal <= MAX_SAMPLES) {
+      iSamples = iVal;
+      Serial.print("SAMPLES:");
+      Serial.println(iSamples);
+    }
+  } else if(strCmd == "TRIG:AUTO") {
+    bTrigAuto = true;
+    Serial.println("TRIG:AUTO");
+  } else if(strCmd == "TRIG:RISE") {
+    bTrigAuto = false;
+    bRisingEdge = true;
+    Serial.println("TRIG:RISE");
+  } else if(strCmd == "TRIG:FALL") {
+    bTrigAuto = false;
+    bRisingEdge = false;
+    Serial.println("TRIG:FALL");
+  } else if(strCmd.startsWith("TRIG:")) {
+    // Numeric trigger level
+    int iVal = strCmd.substring(5).toInt();
+    iTrigLevel = constrain(iVal, 0, 1023);
+    Serial.print("TRIG:");
+    Serial.println(iTrigLevel);
+  } else if(strCmd.startsWith("GAIN:")) {
+    fGain = strCmd.substring(5).toFloat();
+    if(fGain < 1.0f) {
+      fGain = 1.0f;
+    }
+    Serial.print("GAIN:");
+    Serial.println((int)fGain);
+  } else if(strCmd == "MEASURE_VCC") {
+    fV_ref = measureVCC();
+    Serial.print("VCC:");
+    Serial.println(fV_ref, 3);
+  }
+}
 
+// ────── ⋆⋅☆⋅⋆ ────────
+// Setup / Loop
+// ────── ⋆⋅☆⋅⋆ ────────
 
+void setup() {
+  Serial.begin(BAUD_RATE);
 
+  fV_ref = measureVCC();
 
+  setupADC();
 
+  Serial.print("VCC:");
+  Serial.println(fV_ref, 3);
+  Serial.print("RATE:");
+  Serial.println("76000");
+  Serial.println("Oscilloscope ready.");
+}
 
+void loop() {
+  // Check for incoming commands
+  parseCommand();
 
+  // Capture frame
+  bool bTriggered;
 
+  if(bTrigAuto){
+    // Free-run: capture immediately, no trigger wait
+    collectFrame();
+    bTriggered = false;
+  } else {
+    // Edge trigger: wait for crossing, then capture
+    bTriggered = waitForTrigger();
+    collectFrame();
+    // Send even on timeout. Display keeps updating
+  }
 
-
-
-
-
-
-
-
-
+  // Transmit frame
+  sendFrame(bTriggered);
+}
