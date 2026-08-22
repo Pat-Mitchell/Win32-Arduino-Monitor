@@ -80,26 +80,98 @@ struct OscilloscopePanel {
     // ────── ⋆⋅☆⋅⋆ ────────
     // Public interface
     // ────── ⋆⋅☆⋅⋆ ────────
-    void init(int iX, int iY, int iW, int iH);
-    void clear();
+    void Init(int iX, int iY, int iW, int iH);
+    void Clear();
 
     /// @brief Loads a captured frame and computes V_pp, V_rms, frequency
-    void loadFrame(const int* arrData, int iN, float fVcc, float fGain, float fVbias, int iTrig, bool bTriggered);
+    void LoadFrame(const int* arrData, int iN, float fVcc, float fGain, float fVbias, int iTrig, bool bTriggered);
 
     /// @brief Updates display-only parmeters (gain/bias) without a new frame.
     ///   Called when the user changes settings and clicks apply.
-    void updateDisplayParams(float fNewGain, float fNewVbias);
+    void UpdateDisplayParams(float fNewGain, float fNewVbias);
 
-    void draw(HDC hdc) const;
+    void Draw(HDC hdc) const;
 
     /// @brief Converts an ADC const to the recovered input signal voltage
     ///   V_signal = (V_bias - V_out) / Gain
     ///   Returns - when ADC reads V_bias (no signal), positive when the
     ///   inverting output is below bias (input going positive).
-    float adcToVsig(int iAdc) const;
+    float AdcToVsig(int iAdc) const;
   
   private:
-    void computeMeasurements();
-    int mapX(int iIdx) const;
-    int mapY(float fVsig, float fVmin, float fVmax) const;
+    void ComputeMeasurements();
+    int MapX(int iIdx) const;
+    int MapY(float fVsig, float fVmin, float fVmax) const;
+};
+
+// ────── ⋆⋅☆⋅⋆ ────────
+// OscilloscopeWindow
+// ────── ⋆⋅☆⋅⋆ ────────
+class OscilloscopeWindow : public Window {
+  public:
+    OscilloscopeWindow();
+    ~OscilloscopeWindow();
+
+  protected:
+    void OnCreate() override;
+    void OnPaint(HDC hdc) override;
+    void OnCommand(int iControlId, int iNotifCode) override;
+    void OnScroll(HWND hwnd_control, int iCode) override;
+    void OnTimer(int iTimerId) override;
+    void OnDestroy() override;
+
+  private:
+    // Parsing
+    bool ParseLine(const wchar_t* szLine);
+    bool ParseDataLine(const wchar_t* szLine, int* arrOut, int iExpected, int& iActual);
+
+    // Ui helpers
+    void UpdateTrigLabel(int iADC);
+    void UpdateReadouts();
+    void ApplySettings();
+    void SetTriggerMode(bool bAuto);
+    void OnConnect();
+    void OnDisconnect();
+
+    // Members
+    SerialPort port;
+    OscilloscopePanel panel;
+
+    char arrLineBuf[READ_BUF * 4];
+    int iLineBufLen;
+
+    // Two-phase frame parsing
+    bool bExpectingData;
+    int iExpectedSamples;
+    float fFrameVcc;
+    float fFrameGain;
+    int iFrameTrig;
+    bool bFrameTriggered;
+
+    // Current display settings
+    float fCurrentVcc;
+    float fCurrentGain;
+    float fCurrentVbias;
+    bool bAutoTrigger;
+
+    // Controls
+    ComboBox* cmb_port;
+    Button* btn_connect;
+    Button* btn_disc;
+    Button* btn_trig_toggle;
+    Button* btn_trig_rise;
+    Button* btn_trig_fall;
+    Trackbar* trk_trig;
+    Label* lbl_trig_val;
+    TextInput* edit_samples;
+    TextInput* edit_gain;
+    TextInput* edit_vbias;
+    Button* btn_apply;
+    Button* btn_export;
+
+    Label* lbl_vpp_val;
+    Label* lbl_vrms_val;
+    Label* lbl_freq_val;
+    Label* lbl_vcc_val;
+    Label* lbl_status;
 };
