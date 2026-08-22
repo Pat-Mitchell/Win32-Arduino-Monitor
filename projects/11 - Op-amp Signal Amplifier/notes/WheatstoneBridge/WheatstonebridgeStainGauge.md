@@ -157,3 +157,52 @@ $$V_{out} = 5.0 \cdot ({120.12 \over 120 + 120.12} - 0.5) = 5.0 \cdot (0.50025 -
 
 ### The realistic bridge (5% Tolerance resistors)
 
+Three standard 5% tolerance carbon film resistors with a gold band can be anywhere between 114Ω and 126Ω. A "worst case" scenario for the three fixed resistors can be:
+
+- $R_1$: 125Ω (+4.1%)
+- $R_2$: 115Ω (-4.1%)
+- $R_3$: 118Ω (-1.6%)
+- $R_4$: 120Ω (gauges are usually highly precise)
+
+**The Null State**
+
+$$V_{out} = 5.0 \cdot ({120 \over 118 + 120} - {115 \over 125 + 115}) = 5.0 \cdot (0.5042 - 0.4791) = 0.1255 \text {V (or 125.5 mV)}$$
+
+In the null state (no load), the bridge offset error is 125.5 mV. If the op-amp gain is 100, it amplifies the offset error to 12.55 V:
+
+$$V_{amp} = 125.5mV \cdot 100 = 12.55V$$
+
+Running off of the Arduino's 5V supply, the op-amp will be completely saturated and show the max value constantly.
+
+**Solutions**
+
+1. Using 0.1% precision resistors (or better): The initial offset error is minimal enough that the op-amp won't saturate. The initial offset is then subtracted from the readings via software (software taring).
+
+2. Adding a nulling potentiometer: A variable resistor (potentiometer) is placed in series or parallel with one of the bridge arms. While looking at the op-amp output with a multimeter, the potentiometer is adjusted until the voltage reads 0.000V.
+
+### Temperature Strain
+
+When the ambient temperature changes, both the material and strain gauge change physical properties.
+
+- Material expands/contracts: Due to the coefficient of thermal expansion, the material physically stretches or compresses as it gets warmer or colder. The strain gauge being bonded to the material also stretches or compresses.
+
+- The gauge changes resistivity: The constantan foil gauge has its own temperature coefficient of resistance. As its temperature changes, its baseline electrical resistance drifts independant of any mechanical strain.
+
+A quarter-bridge cannot tell the difference between mechanical strain and thermal strain. The resistance changes, the bridge unbalances, and the voltage difference is read by a meter.
+
+**Half-Bridge Configuration**
+
+In a half-bridge, two active strain gauges are mounted to the material, experience the same thermal expansion, and their identical resistances cancel out in the bridge equation. In the case of a cantilever beam, one gauge is mounted to the top of the beam while the other is mounted to the bottom. When load is applied to the beam, one experiences compression while the other tension. As an added benefit, the signal from the bridge is doubled thanks to $R_1$ increasing and $R_2$ decreasing.
+
+### Wiring. Quarter bridge to Op-amp
+
+![Wheatstone Bridge and Op-amp wiring diagram](bridgeAndOpAmpWiring.png)
+
+A Wheatstone bridge is shaped like a diamond with four resistors. In a quarter bridge, three of the resistors are fixed (120Ω for the project) and one is the active strain gauge. The four corners of the bridge are:
+
+- Top Node (Excitation +): The junction between the top-left and top-right resistors.
+- Bottom Node (Excitation -): The junction between the top-left and bottom-left resistors.
+- Left Middle Node (Signal +): The junction between the top-left and bottom-left resistors.
+- Right middle Node (Signal -): The junction between the top-right and bottom-right resistors (where the active strain gauge is located).
+
+In theory, when the bridge is balanced, the excitation voltage (5V Arduino power source) is split evenly between both arms and create no voltage potential difference at either signal nodes. In reality, absolute perfection is impossible and a nulling potentiometer will be used to balance out the bridge.
