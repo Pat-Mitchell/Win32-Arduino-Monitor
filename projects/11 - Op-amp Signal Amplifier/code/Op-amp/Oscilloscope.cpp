@@ -165,9 +165,9 @@ int OscilloscopePanel::MapX(int iIdx) const {
 }
 
 int OscilloscopePanel::MapY(float fVsig, float fVmin, float fVmax) const {
-  int iH = (rect_bounds.bottom - rect_bounds.top) - iPadT - iPadB;
+  int   iH     = (rect_bounds.bottom - rect_bounds.top) - iPadT - iPadB;
   float fRange = fVmax - fVmin;
-  if(fRange < 0.0001f) {
+  if (fRange < 0.0001f) {
     fRange = 0.0001f;
   }
   return rect_bounds.top + iPadT + iH - (int)(((fVsig - fVmin) / fRange) * iH);
@@ -373,11 +373,11 @@ OscilloscopeWindow::OscilloscopeWindow()
   , fCurrentGain(10.0f)
   , fCurrentVbias(1.75f)
   , bAutoTrigger(true)
-  {
-    ZeroMemory(arrLineBuf, sizeof(arrLineBuf));
-  }
+{
+  ZeroMemory(arrLineBuf, sizeof(arrLineBuf));
+}
 
-  OscilloscopeWindow::~OscilloscopeWindow() {
+OscilloscopeWindow::~OscilloscopeWindow() {
   delete cmb_port;
   delete btn_connect;
   delete btn_disc;
@@ -396,310 +396,461 @@ OscilloscopeWindow::OscilloscopeWindow()
   delete lbl_freq_val;
   delete lbl_vcc_val;
   delete lbl_status;
-  }
+}
 
-  void OscilloscopeWindow::OnCreate() {
-    // Connection bar
-    new Label(hwnd_self, L"COM Port:", 16, 18, 72, 24);
-    cmb_port = new ComboBox(hwnd_self, ID_COMBO_PORT, 92, 14, 120, 200);
-    btn_connect = new Button(hwnd_self, L"Connect", ID_BTN_CONNECT, 318, 14, 100, 28);
-    btn_disc = new Button(hwnd_self, L"Disconnect", ID_BTN_DISCONNECT, 318, 14, 100, 28);
-    new Label(hwnd_self, L"115200 baud", 428, 18, 100, 24);
-    btn_disc->Disable();
-    ScanComPorts(cmb_port);
+void OscilloscopeWindow::OnCreate() {
+  // Connection bar
+  new Label(hwnd_self, L"COM Port:", 16, 18, 72, 24);
+  cmb_port = new ComboBox(hwnd_self, ID_COMBO_PORT, 92, 14, 120, 200);
+  btn_connect = new Button(hwnd_self, L"Connect", ID_BTN_CONNECT, 220, 14, 90, 28);
+  btn_disc = new Button(hwnd_self, L"Disconnect", ID_BTN_DISCONNECT, 318, 14, 100, 28);
+  new Label(hwnd_self, L"115200 baud", 428, 18, 100, 24);
+  btn_disc->Disable();
+  ScanComPorts(cmb_port);
 
-    // Trigger controls
-    new Label(hwnd_self, L"Trigger:", 16, 58, 60 ,22);
-    btn_trig_toggle = new Button(hwnd_self, L"Auto", ID_BTN_TRIG_TOGGLE, 78, 52, 70, 28);
-    btn_trig_rise = new Button(hwnd_self, L"Rise \x2191", ID_BTN_TRIG_RISE, 156, 52, 72, 28);
-    btn_trig_fall = new Button(hwnd_self, L"Fall \x2193", ID_BTN_TRIG_FALL, 236, 52, 72, 28);
-    new Label(hwnd_self, L"Level:", 316, 58, 46, 22);
-    // Trackbar range 0-716 (0V to 2.5V op-amp output range)
-    trk_trig = new Trackbar(hwnd_self, ID_TRACKBAR_TRIG, 366, 48, 190, 38, 0, 716);
-    trk_trig->SetPos(360);
-    trk_trig->SetTickFreq(71); // One tick per -0.35V
-    lbl_trig_val = new Label(hwnd_self, L"ADC (±0 mV)", 562, 58, 120, 22);
-    btn_trig_rise->Disable();
-    btn_trig_fall->Disable();
+  // Trigger controls
+  new Label(hwnd_self, L"Trigger:", 16, 58, 60, 22);
+  btn_trig_toggle = new Button(hwnd_self, L"Auto", ID_BTN_TRIG_TOGGLE, 78, 52, 70, 28);
+  btn_trig_rise = new Button(hwnd_self, L"Rise \x2191", ID_BTN_TRIG_RISE, 156, 52, 72, 28);
+  btn_trig_fall = new Button(hwnd_self, L"Fall \x2193", ID_BTN_TRIG_FALL, 236, 52, 72, 28);
+  new Label(hwnd_self, L"Level:", 316, 58, 46, 22);
+  // Trackbar range 0-716 (0V to 3.5V op-amp output range)
+  trk_trig = new Trackbar(hwnd_self, ID_TRACKBAR_TRIG, 366, 48, 190, 38, 0, 716);
+  trk_trig->SetPos(360);
+  trk_trig->SetTickFreq(71);     // One tick per ~0.35V
+  lbl_trig_val = new Label(hwnd_self, L"ADC 360 (±0 mV)", 562, 58, 120, 22);
+  btn_trig_rise->Disable();
+  btn_trig_fall->Disable();
 
-    // Settings bar
-    new Label(hwnd_self, L"Samples:", 16, 102, 64, 22);
-    edit_samples = new TextInput(hwnd_self, ID_EDIT_SAMPLES, 84, 96, 52, 28);
-    edit_samples->SetText(L"256");
+  // Settings bar
+  new Label(hwnd_self, L"Samples:", 16, 102, 64, 22);
+  edit_samples = new TextInput(hwnd_self, ID_EDIT_SAMPLES, 84, 96, 52, 28);
+  edit_samples->SetText(L"256");
 
-    new Label(hwnd_self, L"Gain:", 144, 102, 38, 22);
-    edit_gain = new TextInput(hwnd_self, ID_EDIT_GAIN, 186, 96, 50, 28);
-    edit_gain->SetText(L"10");
+  new Label(hwnd_self, L"Gain:", 144, 102, 38, 22);
+  edit_gain = new TextInput(hwnd_self, ID_EDIT_GAIN, 186, 96, 50, 28);
+  edit_gain->SetText(L"10");
 
-    new Label(hwnd_self, L"V_bias (V):", 244, 102, 74, 22);
-    edit_vbias = new TextInput(hwnd_self, ID_EDIT_VBIAS, 322, 96, 56, 28);
-    edit_vbias->SetText(L"1.75");
+  new Label(hwnd_self, L"V_bias (V):", 244, 102, 74, 22);
+  edit_vbias = new TextInput(hwnd_self, ID_EDIT_VBIAS, 322, 96, 56, 28);
+  edit_vbias->SetText(L"1.75");
 
-    btn_apply = new Button(hwnd_self, L"Apply", ID_BTN_APPLY, 386, 96, 70, 28);
-    btn_export = new Button(hwnd_self, L"Export CSV", ID_BTN_EXPORT, 464, 96, 100, 28);
-    btn_export->Disable();
+  btn_apply  = new Button(hwnd_self, L"Apply", ID_BTN_APPLY, 386, 96, 70, 28);
+  btn_export = new Button(hwnd_self, L"Export CSV", ID_BTN_EXPORT, 464, 96, 100, 28);
+  btn_export->Disable();
 
-    // Measurement readouts
-    new Label(hwnd_self, L"V_pp:", 16, 136, 40, 22);
-    new Label(hwnd_self, L"V_rms:", 178, 136, 44, 22);
-    new Label(hwnd_self, L"Freq:", 340, 136, 38, 22);
-    new Label(hwnd_self, L"VCC:", 488, 136, 36, 22);
+  // Measurement readouts
+  new Label(hwnd_self, L"V_pp:", 16, 136, 40, 22);
+  new Label(hwnd_self, L"V_rms:", 178, 136, 44, 22);
+  new Label(hwnd_self, L"Freq:", 340, 136, 38, 22);
+  new Label(hwnd_self, L"VCC:", 488, 136, 36, 22);
 
-    lbl_vpp_val = new Label(hwnd_self, L"---", 58, 136, 110, 22);
-    lbl_vrms_val = new Label(hwnd_self, L"---", 226, 136, 106, 22);
-    lbl_freq_val = new Label(hwnd_self, L"---", 382, 136, 100, 22);
-    lbl_vcc_val = new Label(hwnd_self, L"---", 528, 136, 90, 22);
+  lbl_vpp_val = new Label(hwnd_self, L"---", 58, 136, 110, 22);
+  lbl_vrms_val = new Label(hwnd_self, L"---", 226, 136, 106, 22);
+  lbl_freq_val = new Label(hwnd_self, L"---", 382, 136, 100, 22);
+  lbl_vcc_val = new Label(hwnd_self, L"---", 528, 136, 90, 22);
 
-    // Status
-    lbl_status = new Label(hwnd_self, L"Disconnected", 16, 163, 580, 18);
+  // Status
+  lbl_status = new Label(hwnd_self, L"Disconnected", 16, 163, 580, 18);
 
-    // Oscilloscope panel
-    panel.Init(16, 186, 648, 390);
-  }
+  // Oscilloscope panel
+  panel.Init(16, 186, 648, 390);
+}
 
-  void OscilloscopeWindow::OnPaint(HDC hdc) {
-    // Fill non-panel client area to prevent redraw flicker
-    RECT rcClient;
-    GetClientRect(hwnd_self, &rcClient);
+void OscilloscopeWindow::OnPaint(HDC hdc) {
+  // Fill non-panel client area to prevent redraw flicker
+  RECT rcClient;
+  GetClientRect(hwnd_self, &rcClient);
 
-    RECT rcTop = { 0, 0, rcClient.right, 186 };
-    RECT rcBtm = { 0, 576, rcClient.right, rcClient.bottom };
-    HBRUSH hbr = (HBRUSH)(COLOR_WINDOW + 1);
-    FillRect(hdc, &rcTop, hbr);
-    FillRect(hdc, &rcBtm, hbr);
+  RECT rcTop = { 0, 0, rcClient.right, 186 };
+  RECT rcBtm = { 0, 576, rcClient.right, rcClient.bottom };
+  HBRUSH hbr = (HBRUSH)(COLOR_WINDOW + 1);
+  FillRect(hdc, &rcTop, hbr);
+  FillRect(hdc, &rcBtm, hbr);
 
-    panel.Draw(hdc);
-  }
+  panel.Draw(hdc);
+}
 
-  void OscilloscopeWindow::OnCommand(int iControlId, int iNotifCode) {
-    switch(iControlId) {
-      case ID_BTN_CONNECT:
-        OnConnect();
-        break;
+void OscilloscopeWindow::OnCommand(int iControlId, int iNotifCode) {
+  switch(iControlId) {
+    case ID_BTN_CONNECT:
+      OnConnect();
+      break;
 
-      case ID_BTN_DISCONNECT:
-        OnDisconnect();
-        break;
+    case ID_BTN_DISCONNECT:
+      OnDisconnect();
+      break;
 
-      case ID_BTN_TRIG_TOGGLE:
-        SetTriggerMode(!bAutoTrigger);
-        if(!bAutoTrigger) {
-          port.Write("TRIG:AUTO");
-        } else {
-          // Resend current trigger level on switch to triggered
-          char arrCmd[16];
-          wsprintfA(arrCmd, "TRIG:%d", trk_trig->GetPos());
-          port.Write(arrCmd);
-        }
-        break;
-
-      case ID_BTN_TRIG_RISE:
-        port.Write("TRIG:RISE");
-        lbl_status->SetText(L"Trigger: Rising edge");
-        break;
-
-      case ID_BTN_TRIG_FALL:
-        port.Write("TRIG:FALL");
-        lbl_status->SetText(L"Trigger: Falling edge");
-        break;
-
-      case ID_BTN_APPLY:
-        ApplySettings();
-        break;
-
-      case ID_BTN_EXPORT: {
-        if(!panel.bHasFrame) {
-          MessageBox(hwnd_self, L"No frame to export", L"Export", MB_OK | MB_ICONWARNING);
-          return;
-        }
-        wchar_t arrPath[MAX_PATH];
-        if(!ShowSaveDialog(hwnd_self, L"CSV Files\0*.csv\0All Files\0*.*\0", L"csv", arrPath, MAX_PATH)) {
-          return;
-        }
-        if(!ExportCSV(arrPath, panel)) {
-          MessageBox(hwnd_self, L"Export failed.", L"Export", MB_OK | MB_ICONERROR);
-        }
-        break;
+    case ID_BTN_TRIG_TOGGLE:
+      SetTriggerMode(!bAutoTrigger);
+      if(!bAutoTrigger) {
+        port.Write("TRIG:AUTO");
+      } else {
+        // Resend current trigger level on switch to triggered
+        char arrCmd[16];
+        wsprintfA(arrCmd, "TRIG:%d", trk_trig->GetPos());
+        port.Write(arrCmd);
       }
+      break;
+
+    case ID_BTN_TRIG_RISE:
+      port.Write("TRIG:RISE");
+      lbl_status->SetText(L"Trigger: Rising edge");
+      break;
+
+    case ID_BTN_TRIG_FALL:
+      port.Write("TRIG:FALL");
+      lbl_status->SetText(L"Trigger: Falling edge");
+      break;
+
+    case ID_BTN_APPLY:
+      ApplySettings();
+      break;
+
+    case ID_BTN_EXPORT: {
+      if(!panel.bHasFrame) {
+        MessageBox(hwnd_self, L"No frame to export", L"Export", MB_OK | MB_ICONWARNING);
+        return;
+      }
+      wchar_t arrPath[MAX_PATH];
+      if(!ShowSaveDialog(hwnd_self, L"CSV Files\0*.csv\0All Files\0*.*\0", L"csv", arrPath, MAX_PATH)) {
+        return;
+      }
+      if(!ExportCSV(arrPath, panel)) {
+        MessageBox(hwnd_self, L"Export failed.", L"Export", MB_OK | MB_ICONERROR);
+      }
+      break;
     }
   }
+}
 
-  void OscilloscopeWindow::OnScroll(HWND hwnd_control, int iCode) {
-    if(!trk_trig) {
-      return;
+void OscilloscopeWindow::OnScroll(HWND hwnd_control, int iCode) {
+  if(!trk_trig) {
+    return;
+  }
+  if(hwnd_control != trk_trig->GetHandle()) {
+    return;
+  }
+  if(!port.IsOpen()) {
+    return;
+  }
+
+  int iPos = trk_trig->GetPos();
+  UpdateTrigLabel(iPos);
+
+  // Send new trigger level to Arduino
+  char arrCmd[16];
+  wsprintfA(arrCmd, "TRIG:%d", iPos);
+  port.Write(arrCmd);
+
+  // Update panel trigger line and repaint
+  panel.iTrigADC = iPos;
+  InvalidateRect(hwnd_self, NULL, FALSE);
+}
+
+void OscilloscopeWindow::OnTimer(int iTimerId) {
+  if(iTimerId != ID_TIMER_POLL) {
+    return;
+  }
+  if(!port.IsOpen()) {
+    return;
+  }
+
+  char arrRaw[READ_BUF];
+  DWORD dwRead = 0;
+  port.Read(arrRaw, READ_BUF, dwRead);
+  if(dwRead == 0) {
+    return;
+  }
+
+  // Append to persistent line buffer
+  if(iLineBufLen + (int)dwRead >= (int)sizeof(arrLineBuf)) {
+    iLineBufLen = 0;
+    ZeroMemory(arrLineBuf, sizeof(arrLineBuf));
+    bExpectingData = false;
+  }
+
+  memcpy(arrLineBuf + iLineBufLen, arrRaw, dwRead);
+  iLineBufLen += (int)dwRead;
+  arrLineBuf[iLineBufLen] = '\0';
+
+  char* pLine = arrLineBuf;
+  char* pEnd = nullptr;
+  bool bRepaint = false;
+
+  while((pEnd = strchr(pLine, '\n')) != nullptr) {
+    *pEnd = '\0';
+    int iLen = (int)strlen(pLine);
+    if(iLen > 0 && pLine[iLen - 1] == '\r') {
+      pLine[iLen - 1] = '\0';
     }
-    if(hwnd_control != trk_trig->GetHandle()) {
-      return;
+
+    wchar_t arrWide[READ_BUF * 2];
+    MultiByteToWideChar(CP_ACP, 0, pLine, -1, arrWide, READ_BUF * 2);
+
+    if(ParseLine(arrWide)) {
+      bRepaint = true;
     }
-    if(!port.IsOpen()) {
-      return;
-    }
+    pLine = pEnd + 1;
+  }
 
-    int iPos = trk_trig->GetPos();
-    UpdateTrigLabel(iPos);
+  int iRemaining = iLineBufLen - (int)(pLine - arrLineBuf);
+  if(iRemaining > 0) memmove(arrLineBuf, pLine, iRemaining);
+  iLineBufLen = iRemaining;
+  arrLineBuf[iLineBufLen] = '\0';
 
-    // Send new trigger level to Arduino
-    char arrCmd[16];
-    wsprintfA(arrCmd, "TRIG:%d", iPos);
-    port.Write(arrCmd);
-
-    // Update panel trigger line and repaint
-    panel.iTrigADC = iPos;
+  if(bRepaint) {
     InvalidateRect(hwnd_self, NULL, FALSE);
   }
+}
 
-  void OscilloscopeWindow::OnTimer(int iTimerId) {
-    if(iTimerId != ID_TIMER_POLL) {
-      return;
+void OscilloscopeWindow::OnDestroy() {
+  KillTimer(hwnd_self, ID_TIMER_POLL);
+  port.Close();
+}
+
+bool OscilloscopeWindow::ParseLine(const wchar_t* szLine) {
+  // FRAME: header. Store metadata, expect data next
+  if(wcsstr(szLine, L"FRAME:")) {
+    iExpectedSamples = (int)ParseFloat(szLine, L"FRAME:");
+    fFrameVcc = ParseFloat(szLine, L"VCC:");
+    fFrameGain = ParseFloat(szLine, L"GAIN:");
+    iFrameTrig = (int)ParseFloat(szLine, L"TRIG:");
+    float fOk = ParseFloat(szLine, L"TRIG_OK:");
+    bFrameTriggered = (fOk > 0.5f);
+
+    if(fFrameVcc > 0.0f) {
+      fCurrentVcc = fFrameVcc;
     }
-    if(!port.IsOpen()) {
-      return;
-    }
-
-    char arrRaw[READ_BUF];
-    DWORD dwRead = 0;
-    port.Read(arrRaw, READ_BUF, dwRead);
-    if(dwRead == 0) {
-      return;
-    }
-
-    // Append to persistent line buffer
-    if(iLineBufLen + (int)dwRead >= (int)sizeof(arrLineBuf)) {
-      iLineBufLen = 0;
-      ZeroMemory(arrLineBuf, sizeof(arrLineBuf));
-      bExpectingData = false;
-    }
-
-    memcpy(arrLineBuf + iLineBufLen, arrRaw, dwRead);
-    iLineBufLen += (int)dwRead;
-    arrLineBuf[iLineBufLen] = '\0';
-
-    char* pLine = arrLineBuf;
-    char* pEnd = nullptr;
-    bool bRepaint = false;
-
-    while((pEnd = strchr(pLine, '\n')) != nullptr) {
-      *pEnd = '\0';
-      int iLen = (int)strlen(pLine);
-      if(iLen > 0 && pLine[iLen - 1] == '\r') {
-        pLine[iLen - 1] = '\0';
-      }
-
-      wchar_t arrWide[READ_BUF * 2];
-      MultiByteToWideChar(CP_ACP, 0, pLine, -1, arrWide, READ_BUF * 2);
-
-      if(ParseLine(arrWide)) bRepaint = true;
-      pLine = pEnd + 1;
+    if(fFrameGain > 0.0f) {
+      fCurrentGain = fFrameGain;
     }
 
-    int iRemaining = iLineBufLen - (int)(pLine - arrLineBuf);
-    if(iRemaining > 0) memmove(arrLineBuf, pLine, iRemaining);
-    iLineBufLen = iRemaining;
-    arrLineBuf[iLineBufLen] = '\0';
+    // update VCC label live from every frame header
+    wchar_t arrBuf[24];
+    int iW = (int)fCurrentVcc;
+    int iF = (int)((fCurrentVcc - iW) * 1000);
+    wsprintf(arrBuf, L"%d.%03d V", iW, iF);
+    lbl_vcc_val->SetText(arrBuf);
 
-    if(bRepaint) {
-      InvalidateRect(hwnd_self, NULL, FALSE);
-    }
+    // Update status
+    lbl_status->SetText(bAutoTrigger ? L"Auto - streaming" : (bFrameTriggered ? L"Triggered" : L"Triggered - timeout"));
+
+    bExpectingData = (iExpectedSamples > 0 && iExpectedSamples <= MAX_SCOPE_SAMPLES);
+    return false;
   }
 
-  void OscilloscopeWindow::OnDestroy() {
-    KillTimer(hwnd_self, ID_TIMER_POLL);
-    port.Close();
-  }
+  // Data line. Comma-separated ADC values
+  if(bExpectingData) {
+    bExpectingData = false;
 
-  bool OscilloscopeWindow::ParseLine(const wchar_t* szLine) {
-    // FRAME: header. Store metadata, expect data next
-    if(wcsstr(szLine, L"FRAME:")) {
-      iExpectedSamples = (int)ParseFloat(szLine, L"FRAME:");
-      fFrameVcc = ParseFloat(szLine, L"VCC:");
-      fFrameGain = ParseFloat(szLine, L"GAIN:");
-      iFrameTrig = (int)ParseFloat(szLine, L"TRIG:");
-      float fOk = ParseFloat(szLine, L"TRIG_OK:");
-      bFrameTriggered = (fOk > 0.5f);
-
-      if(fFrameVcc > 0.0f) {
-        fCurrentVcc = fFrameVcc;
-      }
-      if(fFrameGain > 0.0f) {
-        fCurrentGain = fFrameGain;
-      }
-
-      // update VCC label live from every frame header
-      wchar_t arrBuf[24];
-      int iW = (int)fCurrentVcc;
-      int iF = (int)((fCurrentVcc - iW) * 1000);
-      wsprintf(arrBuf, L"%d.%03d V", iW, iF);
-      lbl_vcc_val->SetText(arrBuf);
-
-      // Update status
-      lbl_status->SetText(bAutoTrigger ? L"Auto - streaming" : (bFrameTriggered ? L"Triggered" : L"Triggered - timeout"));
-
-      bExpectingData = (iExpectedSamples > 0 && iExpectedSamples <= MAX_SCOPE_SAMPLES);
-      return false;
-    }
-
-    // Data line. Comma-separated ADC values
-    if(bExpectingData) {
-      bExpectingData = false;
-
-      int arrTemp[MAX_SCOPE_SAMPLES];
-      int iActual = 0;
-      if(ParseDataLine(szLine, arrTemp, iExpectedSamples, iActual) && iActual >=2) {
-        panel.LoadFrame(arrTemp, iActual, fCurrentVcc, fCurrentGain, fCurrentVbias, iFrameTrig, bFrameTriggered);
-        UpdateReadouts();
-        btn_export->Enable();
-        return true; // Repaint
-      }
-      return false;
-    }
-
-    // VCC message (startup or MEASURE_VCC response)
-    if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"FRAME:")) {
-      float fV = ParseFloat(szLine, L"VCC:");
-      if(fV > 0.0f) {
-        fCurrentVcc = fV;
-        wchar_t arrBuf[16];
-        int iW = (int)fV;
-        int iF = (int)((fV - iW) * 1000);
-        wsprintf(arrBuf, L"%d.%03d V", iW, iF);
-        lbl_vcc_val->SetText(arrBuf);
-      }
-      return false;
+    int arrTemp[MAX_SCOPE_SAMPLES];
+    int iActual = 0;
+    if(ParseDataLine(szLine, arrTemp, iExpectedSamples, iActual) && iActual >=2) {
+      panel.LoadFrame(arrTemp, iActual, fCurrentVcc, fCurrentGain, fCurrentVbias, iFrameTrig, bFrameTriggered);
+      UpdateReadouts();
+      btn_export->Enable();
+      return true; // Repaint
     }
     return false;
   }
 
-  bool OscilloscopeWindow::ParseDataLine(const wchar_t* szLine, int* arrOut, int iExpected, int& iActual) {
-    iActual = 0;
-    const wchar_t* p = szLine;
+  // VCC message (startup or MEASURE_VCC response)
+  if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"FRAME:")) {
+    float fV = ParseFloat(szLine, L"VCC:");
+    if(fV > 0.0f) {
+      fCurrentVcc = fV;
+      wchar_t arrBuf[16];
+      int iW = (int)fV;
+      int iF = (int)((fV - iW) * 1000);
+      wsprintf(arrBuf, L"%d.%03d V", iW, iF);
+      lbl_vcc_val->SetText(arrBuf);
+    }
+    return false;
+  }
+  return false;
+}
 
-    while(*p && iActual < iExpected) {
-      wchar_t* pEnd = nullptr;
-      long lVal = wcstol(p, &pEnd, 10);
-      if(pEnd == p) {
-        break;
-      }
+bool OscilloscopeWindow::ParseDataLine(const wchar_t* szLine, int* arrOut, int iExpected, int& iActual) {
+  iActual = 0;
+  const wchar_t* p = szLine;
 
-      arrOut[iActual++] = (int)lVal;
+  while(*p && iActual < iExpected) {
+    wchar_t* pEnd = nullptr;
+    long lVal = wcstol(p, &pEnd, 10);
+    if(pEnd == p) {
+      break;
+    }
 
-      if(*pEnd == L',') {
-        p = pEnd + 1;
-      } else {
-        p = pEnd;
-      }
+    arrOut[iActual++] = (int)lVal;
 
-      return (iActual > 0);
+    if(*pEnd == L',') {
+      p = pEnd + 1;
+    } else {
+      p = pEnd;
     }
   }
+  return (iActual > 0);
+}
 
-  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    INITCOMMONCONTROLSEX icc = {};
-    icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-    icc.dwICC = ICC_WIN95_CLASSES;
-    InitCommonControlsEx(&icc);
+void OscilloscopeWindow::UpdateTrigLabel(int iADC) {
+  float fVout = (iADC / 1023.0f) * fCurrentVcc;
+  float fVsig_mV = ((fCurrentVbias - fVout) - fCurrentGain) * 1000.0f;
+  int iSig_mV = (int)fVsig_mV;
 
-    OscilloscopeWindow win_main;
-    win_main.Create(hInstance, L"Op-Amp Oscilloscope", 680, 600);
-    win_main.Show(nCmdShow);
-    return win_main.Run();
+  wchar_t arrBuf[48];
+  if(iSig_mV > 0) {
+    wsprintf(arrBuf, L"ADC %d (+%d mV)", iADC, iSig_mV);
+  } else if (iSig_mV < 0) {
+    wsprintf(arrBuf, L"ADC %d (%d mV)", iADC, iSig_mV);
+  } else {
+    wsprintf(arrBuf, L"ADC %d (~0 mV)", iADC);
   }
+
+  lbl_trig_val->SetText(arrBuf);
+}
+
+void OscilloscopeWindow::UpdateReadouts() {
+  wchar_t arrBuf[32];
+
+  // V_pp in mV
+  wsprintf(arrBuf, L"%d mV", (int)(panel.fLastVpp * 1000.0f));
+  lbl_vpp_val->SetText(arrBuf);
+
+  // V_rms in mV
+  wsprintf(arrBuf, L"%d mV", (int)(panel.fLastVrms * 1000.0f));
+  lbl_vrms_val->SetText(arrBuf);
+
+  // Frequency
+  if(panel.fLastFreq < 0.0f) {
+    lbl_freq_val->SetText(L"< 2 cycles");
+  } else if(panel.fLastFreq >= 1000.0f) {
+    int iW = (int)(panel.fLastFreq / 1000.0f);
+    int iF = (int)((panel.fLastFreq / 1000.0f - iW) * 10);
+    wsprintf(arrBuf, L"%d.%d kHz", iW, iF);
+    lbl_freq_val->SetText(arrBuf);
+  } else {
+    wsprintf(arrBuf, L"%d Hz", (int)panel.fLastFreq);
+    lbl_freq_val->SetText(arrBuf);
+  }
+}
+
+void OscilloscopeWindow::ApplySettings() {
+  wchar_t arrBuf[32];
+
+  // Samples
+  edit_samples->GetText(arrBuf, 32);
+  int iSamples = (int)wcstol(arrBuf, nullptr, 10);
+  int iTempMin = (((512) < (iSamples)) ? (512) : (iSamples));
+  iSamples = (((64) > (iTempMin)) ? (64) : (iTempMin));
+  wsprintf(arrBuf, L"%d", iSamples);
+  edit_samples->SetText(arrBuf);
+
+  char arrCmd[24];
+  wsprintfA(arrCmd, "SAMPLES:%d", iSamples);
+  port.Write(arrCmd);
+
+  // Gain
+  edit_gain->GetText(arrBuf, 32);
+  float fGain = wcstof(arrBuf, nullptr);
+  if (fGain < 1.0f) { 
+    fGain = 1.0f; edit_gain->SetText(L"1");
+  }
+  fCurrentGain = fGain;
+  wsprintfA(arrCmd, "GAIN:%d", (int)fGain);
+  port.Write(arrCmd);
+
+  // V_bias
+  edit_vbias->GetText(arrBuf, 32);
+  float fVbias = wcstof(arrBuf, nullptr);
+  if (fVbias < 0.0f || fVbias > 5.0f) {
+    fVbias = 1.75f;
+  }
+  fCurrentVbias = fVbias;
+
+  // Apply to panel and repaint with updated settings
+  panel.UpdateDisplayParams(fCurrentGain, fCurrentVbias);
+  UpdateTrigLabel(trk_trig->GetPos());
+  InvalidateRect(hwnd_self, NULL, FALSE);
+}
+
+void OscilloscopeWindow::SetTriggerMode(bool bAuto) {
+  bAutoTrigger = bAuto;
+  btn_trig_toggle->SetText(bAuto ? L"Auto" : L"Triggered");
+  if (bAuto) {
+    btn_trig_rise->Disable();
+    btn_trig_fall->Disable();
+    trk_trig->Disable();
+  } else {
+    btn_trig_rise->Enable();
+    btn_trig_fall->Enable();
+    trk_trig->Enable();
+  }
+}
+
+void OscilloscopeWindow::OnConnect() {
+  if (cmb_port->GetCount() == 0) {
+    MessageBox(hwnd_self, L"No COM ports found.", L"Connect", MB_OK | MB_ICONWARNING);
+    return;
+  }
+
+  wchar_t arrPortName[16];
+  cmb_port->GetSelected(arrPortName, 16);
+
+  // 115200 baud. must match oscilloscope.ino
+  if (!port.Open(arrPortName, SCOPE_BAUD_RATE)) {
+    wchar_t arrMsg[64];
+    wsprintf(arrMsg, L"Failed to open %s.\nError: %lu", arrPortName, port.GetLastErrorCode());
+    MessageBox(hwnd_self, arrMsg, L"Connect", MB_OK | MB_ICONERROR);
+    return;
+  }
+
+  SetTimer(hwnd_self, ID_TIMER_POLL, POLL_MS, NULL);
+
+  btn_connect->Disable();
+  btn_disc->Enable();
+  btn_apply->Enable();
+  cmb_port->Disable();
+
+  lbl_status->SetText(L"Connected. Auto streaming...");
+  SetTriggerMode(true);   // Start in Auto mode
+
+  // Send initial settings
+  port.Write("TRIG:AUTO");
+  char arrCmd[24];
+  wsprintfA(arrCmd, "SAMPLES:%d", 256);
+  port.Write(arrCmd);
+}
+
+void OscilloscopeWindow::OnDisconnect() {
+  KillTimer(hwnd_self, ID_TIMER_POLL);
+  port.Close();
+  bExpectingData = false;
+
+  btn_connect->Enable();
+  btn_disc->Disable();
+  btn_apply->Disable();
+  btn_export->Disable();
+  cmb_port->Enable();
+
+  lbl_vpp_val->SetText (L"---");
+  lbl_vrms_val->SetText(L"---");
+  lbl_freq_val->SetText(L"---");
+  lbl_vcc_val->SetText (L"---");
+  lbl_status->SetText  (L"Disconnected");
+
+  SetTriggerMode(true);
+  ScanComPorts(cmb_port);
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+  INITCOMMONCONTROLSEX icc = {};
+  icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+  icc.dwICC = ICC_WIN95_CLASSES;
+  InitCommonControlsEx(&icc);
+
+  OscilloscopeWindow win_main;
+  win_main.Create(hInstance, L"Op-Amp Oscilloscope", 700, 620);
+  win_main.Show(nCmdShow);
+  return win_main.Run();
+}
