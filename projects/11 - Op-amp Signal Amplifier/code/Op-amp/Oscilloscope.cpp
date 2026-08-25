@@ -276,14 +276,14 @@ void OscilloscopePanel::Draw(HDC hdc) const {
 
   // Top, mid, bottom
   wsprintf(arrBuf, L"%d", (int)(fVmax * 1000));
-  TextOut(hdc, iL + 2, MapY(fVmax, fVmin, fVmax) - 6, arrBuf, lstrlen(arrBuf));
+  TextOut(hdc, iL + 2, MapY(fVmax, fVmin, fVmax) + 6, arrBuf, lstrlen(arrBuf));
   wsprintf(arrBuf, L"%d", (int)(fVmid * 100));
   TextOut(hdc, iL + 2, MapY(fVmid, fVmin, fVmax) - 6, arrBuf, lstrlen(arrBuf));
   wsprintf(arrBuf, L"%d", (int)(fVmin * 1000));
   TextOut(hdc, iL + 2, MapY(fVmin, fVmin, fVmax) - 6, arrBuf, lstrlen(arrBuf));
 
   // Y axis unit label
-  TextOut(hdc, iL + 2, iPT - 14, L"mV", 2);
+  TextOut(hdc, iL + 2, iPT - 10, L"mV", 2);
 
   // X axis labels
   float fTotalMs = (float)(((iCount) > (1)) ? (iCount) : (1)) / SCOPE_SAMPLE_RATE * 1000.0f;
@@ -291,7 +291,7 @@ void OscilloscopePanel::Draw(HDC hdc) const {
   int iTms_frac = (int)((fTotalMs - iTms_whole) * 10);
   wsprintf(arrBuf, L"%d.%dms", iTms_whole, iTms_frac);
   TextOut(hdc, iPR - 28, iPB + 6, arrBuf, lstrlen(arrBuf));
-  TextOut(hdc, iPL - 4, iPB = 6, L"0", 1);
+  TextOut(hdc, iPL - 4, iPB + 6, L"0", 1);
 
   // Zero line (V_sig = 0, i.e. no imput signal)
   int iY0 = MapY(0.0f, fVmin, fVmax);
@@ -325,7 +325,7 @@ void OscilloscopePanel::Draw(HDC hdc) const {
   // No Frame placeholder
   if(!bHasFrame || iCount < 2) {
     SetTextColor(hdc, kNoSig);
-    RECT rcCenter = { iPL, iPT, iPR, iPB };
+    RECT rcCenter = { iPL, iPT - 20, iPR, iPB - 20 };
     DrawText(hdc, L"No signal - connect and start streaming", -1, &rcCenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
     return;
   }
