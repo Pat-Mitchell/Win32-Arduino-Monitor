@@ -1,0 +1,93 @@
+<svg width="680" viewBox="0 0 680 490" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Oscilloscope Op-amp Wiring Diagram</title>
+
+<rect width="680" height="490" fill="#ffffff"/>
+
+<!-- Background rectangle -->
+<rect width="100%" height="100%" style="fill:rgb(54, 54, 54)" />
+
+<!-- Arduino block -->
+<rect x="500" y="45" width="150" height="410" rx="8" fill="#185fa5" stroke="#e6f1fb" stroke-width="1"/>
+<text font-family="sans-serif" font-size="14" font-weight="500" fill="#e6f1fb" text-anchor="middle" x="575" y="72">Arduino Mega</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="165">5V Vcc</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="297">A0</text>
+<text font-family="sans-serif" font-size="11" fill="#e6f1fb" x="512" y="445">GND</text>
+<circle cx="500" cy="165" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="500" cy="300" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="500" cy="450" r="3" fill="rgb(250, 249, 245)"/>
+
+<!-- Op-amp -->
+<polygon points="300,250 300,350 380,300" fill="#a68e37" stroke="#c7b163" stroke-width="1"/>
+<line x1="380" y1="300" x2="500" y2="300" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="380" cy="300" r="3" fill="rgb(250, 249, 245)"/>
+<text font-family="sans-serif" font-size="22" fill="#1f1004" text-anchor="end" x="316" y="286">-</text>
+<text font-family="sans-serif" font-size="22" fill="#1f1004" text-anchor="end" x="318" y="328">+</text>
+	<!-- Negative Feedback Wire -->
+<line x1="420" y1="300" x2="420" y2="220" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="280" y1="220" x2="420" y2="220" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="280" y1="220" x2="280" y2="280" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="420" cy="300" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="280" cy="280" r="3" fill="rgb(250, 249, 245)"/>
+<rect x="413" y="240" width="14" height="40" fill="#634025" stroke="#361f0d" stroke-width="1"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="465" y="260">100kΩ</text>
+	<!-- Virtual Ground bias -->
+<line x1="230" y1="320" x2="300" y2="320" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="300" cy="320" r="3" fill="rgb(250, 249, 245)"/>
+<line x1="230" y1="320" x2="230" y2="448" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="230" y1="400" x2="275" y2="400" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="285" y1="400" x2="340" y2="400" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="275" y1="390" x2="275" y2="410" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<path d="M287 390 Q280 400 287 410" fill="none" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="290" y="380">10µF</text>
+
+<!-- Electret Microphone -->
+<circle cx="125" cy="300" r="30" fill="#244524" stroke="#528252"  stroke-width="1"/>
+<line x1="95" y1="260" x2="95" y2="340" stroke="#528252" stroke-width="2"/>
+	<!-- Electret to Op-amp -->
+<line x1="149" y1="280" x2="200" y2="280" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="207" y1="280" x2="300" y2="280" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="149" cy="280" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="300" cy="280" r="3" fill="rgb(250, 249, 245)"/>
+<line x1="200" y1="290" x2="200" y2="270" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<path d="M210 290 Q203 280 210 270" fill="none" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<rect x="230" y="273" width="40" height="14" fill="#634025" stroke="#361f0d" stroke-width="1"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="260" y="265">10kΩ</text>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="215" y="260">1µF</text>
+	<!-- To GND -->
+<line x1="149" y1="320" x2="169" y2="320" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="149" cy="320" r="3" fill="rgb(250, 249, 245)"/>
+<line x1="169" y1="310" x2="169" y2="330" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="174" y1="313" x2="174" y2="327" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="179" y1="316" x2="179" y2="324" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+
+<!-- GND rail -->
+<text font-family="sans-serif" font-size="12" fill="rgb(250, 249, 245)" text-anchor="middle" x="320" y="478">GND</text>
+<circle cx="55" cy="448" r="3.5" fill="rgb(250, 249, 245)"/>
+	<!-- Op-amp to GND -->
+<line x1="340" y1="325" x2="340" y2="448" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<line x1="55" y1="448" x2="500" y2="448" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="340" cy="325" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="340" cy="448" r="3" fill="rgb(250, 249, 245)"/>
+
+<!-- 5V power supply line -->
+<line x1="55" y1="165" x2="500" y2="165" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="55" cy="165" r="3.5" fill="rgb(250, 249, 245)"/>
+	<!-- To Op-amp -->
+<line x1="340" y1="165" x2="340" y2="275" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="340" cy="165" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="340" cy="275" r="3" fill="rgb(250, 249, 245)"/>
+	<!-- To Electret Microphone -->
+<line x1="130" y1="165" x2="130" y2="270" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<circle cx="130" cy="165" r="3" fill="rgb(250, 249, 245)"/>
+<circle cx="130" cy="270" r="3" fill="rgb(250, 249, 245)"/>
+<rect x="123" y="200" width="14" height="40" fill="#634025" stroke="#361f0d" stroke-width="1"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="160" y="220">1kΩ</text>
+
+<!-- Vcc to GND rail -->
+<line x1="55" y1="165" x2="55" y2="448" stroke="rgb(250, 249, 245)" stroke-width="2"/>
+<rect x="130" y="441" width="40" height="14" fill="#634025" stroke="#361f0d" stroke-width="1"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="160" y="435">18kΩ</text>
+<rect x="260" y="441" width="40" height="14" fill="#634025" stroke="#361f0d" stroke-width="1"/>
+<text font-family="sans-serif" font-size="11" fill="rgb(250, 249, 245)" text-anchor="end" x="290" y="435">10kΩ</text>
+
+</svg>
