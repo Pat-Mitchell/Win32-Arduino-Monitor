@@ -217,7 +217,7 @@ void OscilloscopePanel::Draw(HDC hdc) const {
       fVmin = -0.200f;
       fVmax = 0.200f;
     } else {
-      float fMargin = fObsRange * 2.0f;
+      float fMargin = fObsRange * 0.2f;
       fVmin = fObsMin - fMargin;
       fVmax = fObsMax + fMargin;
     }
@@ -277,7 +277,7 @@ void OscilloscopePanel::Draw(HDC hdc) const {
   // Top, mid, bottom
   wsprintf(arrBuf, L"%d", (int)(fVmax * 1000));
   TextOut(hdc, iL + 2, MapY(fVmax, fVmin, fVmax) + 6, arrBuf, lstrlen(arrBuf));
-  wsprintf(arrBuf, L"%d", (int)(fVmid * 100));
+  wsprintf(arrBuf, L"%d", (int)(fVmid * 1000));
   TextOut(hdc, iL + 2, MapY(fVmid, fVmin, fVmax) - 6, arrBuf, lstrlen(arrBuf));
   wsprintf(arrBuf, L"%d", (int)(fVmin * 1000));
   TextOut(hdc, iL + 2, MapY(fVmin, fVmin, fVmax) - 6, arrBuf, lstrlen(arrBuf));
@@ -483,7 +483,7 @@ void OscilloscopeWindow::OnCommand(int iControlId, int iNotifCode) {
 
     case ID_BTN_TRIG_TOGGLE:
       SetTriggerMode(!bAutoTrigger);
-      if(!bAutoTrigger) {
+      if(bAutoTrigger) {
         port.Write("TRIG:AUTO");
       } else {
         // Resend current trigger level on switch to triggered
@@ -695,7 +695,7 @@ bool OscilloscopeWindow::ParseDataLine(const wchar_t* szLine, int* arrOut, int i
 
 void OscilloscopeWindow::UpdateTrigLabel(int iADC) {
   float fVout = (iADC / 1023.0f) * fCurrentVcc;
-  float fVsig_mV = ((fCurrentVbias - fVout) - fCurrentGain) * 1000.0f;
+  float fVsig_mV = ((fCurrentVbias - fVout) / fCurrentGain) * 1000.0f;
   int iSig_mV = (int)fVsig_mV;
 
   wchar_t arrBuf[48];
