@@ -16,12 +16,13 @@
 <circle cx="500" cy="300" r="3" fill="rgb(250, 249, 245)"/>
 <circle cx="500" cy="450" r="3" fill="rgb(250, 249, 245)"/>
 
-<!-- Op-amp -->
+<!-- LM358 Op-amp -->
 <polygon points="300,250 300,350 380,300" fill="#a68e37" stroke="#c7b163" stroke-width="1"/>
 <line x1="380" y1="300" x2="500" y2="300" stroke="rgb(250, 249, 245)" stroke-width="2"/>
 <circle cx="380" cy="300" r="3" fill="rgb(250, 249, 245)"/>
 <text font-family="sans-serif" font-size="22" fill="#1f1004" text-anchor="end" x="316" y="286">-</text>
 <text font-family="sans-serif" font-size="22" fill="#1f1004" text-anchor="end" x="318" y="328">+</text>
+<text font-family="sans-serif" font-size="12" fill="#1f1004" text-anchor="end" x="348" y="303">LM358</text>
 	<!-- Negative Feedback Wire -->
 <line x1="450" y1="300" x2="450" y2="200" stroke="rgb(250, 249, 245)" stroke-width="2"/>
 <line x1="280" y1="200" x2="450" y2="200" stroke="rgb(250, 249, 245)" stroke-width="2"/>
@@ -53,6 +54,8 @@
 <!-- Electret Microphone -->
 <circle cx="125" cy="300" r="30" fill="#244524" stroke="#528252"  stroke-width="1"/>
 <line x1="95" y1="260" x2="95" y2="340" stroke="#528252" stroke-width="2"/>
+<text font-family="sans-serif" font-size="10" fill="#528252" text-anchor="end" x="141" y="295">Electret</text>
+<text font-family="sans-serif" font-size="10" fill="#528252" text-anchor="end" x="150" y="305">Microphone</text>
 	<!-- Electret to Op-amp -->
 <line x1="149" y1="280" x2="200" y2="280" stroke="rgb(250, 249, 245)" stroke-width="2"/>
 <line x1="207" y1="280" x2="300" y2="280" stroke="rgb(250, 249, 245)" stroke-width="2"/>
