@@ -3,7 +3,6 @@
 ///   Negative values shown below the zero line (compression)
 ///   Positive values shown above the zero line (tension)
 
-// ────── ⋆⋅☆⋅⋆ ────────
 #pragma once
 
 #include "../../../../pch.h"
@@ -20,7 +19,7 @@ struct StrainPlotPanel {
 
   void Init(int iX, int iY, int iW, int iH);
   void Clear();
-  void AddSamples(float fTime_ms, float fStrain_ue);
+  void AddSample(float fTime_ms, float fStrain_ue);
 
   float GetYMax() const;
   int MapX(int iIdx) const;
