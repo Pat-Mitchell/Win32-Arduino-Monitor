@@ -248,5 +248,218 @@ void StrainGaugeWindow::OnDestroy() {
 }
 
 bool StrainGaugeWindow::ParseLine(const wchar_t* szLine) {
-  
+  // Telemetry: "SAVG:xxx,VADC:x.xxx,DELTA:xxxx,TARED:n"
+  if(wcsstr(szLine, L"SAVEG:") && wcsstr(szLine, L"DELTA:")) {
+    float fSavg = ParseFloat(szLine, L"SAVG:");
+    float fVadc = ParseFloat(szLine, L"VADC:");
+    float fDelta = ParseFloat(szLine, L"DELTA:");
+    float fTared = ParseFloat(szLine, L"TARED:");
+
+    if (fSavg < 0 || fVadc < 0) {
+      return false;
+    }
+    bTared = (fTared > 0.5f);
+
+    // Raw readouts
+    wchar_t arrBuf[32];
+    wsprintf(arrBuf, L"%d", (int)fSavg);
+    lbl_adc_val->SetText(arrBuf);
+
+    int iVW = (int)fVadc;
+    int iVF = (int)((fVadc - iVW) * 1000);
+    wsprintf(arrBuf, L"%d.%03d V", iVW, iVF);
+    lbl_vadc_val->SetText(arrBuf);
+
+    wsprintf(arrBuf, L"%+d ADC", (int)fDelta);
+    lbl_delta_val->SetText(arrBuf);
+
+    // Compute µε and stress if tared
+    if (bTared) {
+      UpdateReadouts((int)fDelta, fVadc);
+
+      long lNow = (long)GetTickCount();
+      if (lRecStart == 0) {
+        lRecStart = lNow;
+      }
+
+      // Compute µε for plot
+      float fUe = (4.0f * fDelta * 1000000.0f) / (1023.0f * fGain * fGF);
+      plot.AddSample((float)(lNow - lRecStart), fUe);
+      btn_export->Enable();
+    } else {
+      lbl_strain_val->SetText(L"--- (not tared)");
+      lbl_stress_val->SetText(L"---");
+      lbl_defl_val->SetText(L"---");
+    }
+
+    return true;
+  }
+
+  // TARE acknowledgement
+  if (wcsstr(szLine, L"TARE:OK")) {
+    float fAdc = ParseFloat(szLine, L"ADC:");
+    float fV   = ParseFloat(szLine, L"VCC:");
+
+    if (fAdc >= 0) {
+      iADC_tare = (int)fAdc;
+    }
+    if (fV   >  0) {
+      fVcc = fV;
+    }
+
+    bTared = true;
+
+    wchar_t arrBuf[48];
+    wsprintf(arrBuf, L"Status: Tared  (ADC = %d)", iADC_tare);
+    lbl_tare_status->SetText(arrBuf);
+
+    // Reset plot on tare — new baseline
+    plot.Clear();
+    lRecStart = 0;
+    return false;
+  }
+
+  // VCC reading
+  if(wcsstr(szLine, L"VCC:") && !wcsstr(szLine, L"TARE:")) {
+    float fV = ParseFloat(szLine, L"VCC:");
+    if(fV > 0.0f) {
+      fVcc = fV;
+      wchar_t arrBuf[16];
+      int iW = (int)fV;
+      int iF = (int)((fV - iW) * 1000);
+      wsprintf(arrBuf, L"%d.%03d V", iW, iF);
+      lbl_vcc_val->SetText(arrBuf);
+    }
+    return false;
+  }
+
+  // RESET acknowledgement
+  if(wcsstr(szLine, L"RESET:OK")) {
+    plot.Clear();
+    lRecStart = 0;
+    return true;
+  }
+  return false;
+}
+
+void StrainGaugeWindow::UpdateReadouts(int iDelta, float fVadc) {
+  // Microstrain 
+  // ε = 4 × ΔADC / (1023 × Gain × GF)
+  // ε_µ = ε × 1,000,000
+  float fUe = (4.0f * iDelta * 1000000.0f) / (1023.0f * fGain * fGF);
+
+  wchar_t arrBuf[32];
+  wsprintf(arrBuf, L"%+d µε", (int)fUe);
+  lbl_strain_val->SetText(arrBuf);
+
+  // Stress (MPa)
+  // σ = E × ε   (E in Pa = fE_GPa × 10⁹)
+  float fStress_MPa = (fUe / 1000000.0f) * (fE_GPa * 1000.0f);
+  int   iStW = (int)fStress_MPa;
+  int   iStF = abs((int)((fStress_MPa - (int)fStress_MPa) * 10));
+  wsprintf(arrBuf, L"%+d.%01d MPa", iStW, iStF);
+  lbl_stress_val->SetText(arrBuf);
+
+  // Estimated tip deflection (mm)
+  // From cantilever bending: δ = ε × L² / (3 × h/2)
+  // where ε is dimensionless strain, L and h are in consistent units
+  if (fH_mm > 0.001f && fL_mm > 0.001f) {
+    float fL_m = fL_mm / 1000.0f;
+    float fH_m = fH_mm / 1000.0f;
+    float fEps = fUe / 1000000.0f;
+    float fDef_m = (fEps * fL_m * fL_m) / (3.0f * (fH_m / 2.0f));
+    int iDef_mm  = (int)(fDef_m * 1000.0f);
+    int iDef_frac = abs((int)((fDef_m * 1000.0f - (int)(fDef_m * 1000.0f)) * 10));
+    wsprintf(arrBuf, L"%+d.%01d mm", iDef_mm, iDef_frac);
+    lbl_defl_val->SetText(arrBuf);
+  }
+}
+
+void StrainGaugeWindow::ApplySettings() {
+  wchar_t arrBuf[32];
+
+  edit_gain->GetText(arrBuf, 32);    
+  fGain = wcstof(arrBuf, nullptr);
+
+  edit_gf->GetText(arrBuf, 32);      
+  fGF = wcstof(arrBuf, nullptr);
+
+  edit_elastic->GetText(arrBuf, 32); 
+  fE_GPa = wcstof(arrBuf, nullptr);
+
+  edit_h->GetText(arrBuf, 32);       
+  fH_mm = wcstof(arrBuf, nullptr);
+
+  edit_l->GetText(arrBuf, 32);       
+  fL_mm = wcstof(arrBuf, nullptr);
+
+  if(fGain < 1.0f) { 
+    fGain = 1.0f;  
+    edit_gain->SetText(L"1"); 
+  }
+  if(fGF < 0.5f) { 
+    fGF = 2.0f;  
+    edit_gf->SetText(L"2.0"); 
+  }
+  if(fE_GPa < 1.0f) { 
+    fE_GPa = 69.0f; 
+    edit_elastic->SetText(L"69"); 
+  }
+  if(fH_mm  < 0.1f) { 
+    fH_mm  = 5.0f;  
+    edit_h->SetText(L"5"); 
+  }
+  if(fL_mm  < 1.0f) { 
+    fL_mm  = 100.0f;
+    edit_l->SetText(L"100"); 
+  }
+}
+
+void StrainGaugeWindow::OnConnect() {
+  if(cmb_port->GetCount() == 0) {
+    MessageBox(hwnd_self, L"No COM ports found.", L"Connect", MB_OK | MB_ICONWARNING);
+    return;
+  }
+
+  wchar_t arrPortName[16];
+  cmb_port->GetSelected(arrPortName, 16);
+
+  // 9600 baud
+  if(!port.Open(arrPortName, 9600)) {
+    wchar_t arrMsg[64];
+    wsprintf(arrMsg, L"Failed to open %s.\nError: %lu", arrPortName, port.GetLastErrorCode());
+    MessageBox(hwnd_self, arrMsg, L"Connect", MB_OK | MB_ICONERROR);
+    return;
+  }
+
+  SetTimer(hwnd_self, ID_TIMER_POLL, POLL_MS, NULL);
+  lRecStart = 0;
+
+  btn_connect->Disable();
+  btn_disc->Enable();
+  btn_tare->Enable();
+  btn_reset->Enable();
+  cmb_port->Disable();
+}
+
+void StrainGaugeWindow::OnDisconnect() {
+  KillTimer(hwnd_self, ID_TIMER_POLL);
+  port.Close();
+
+  btn_connect->Enable();
+  btn_disc->Disable();
+  btn_tare->Disable();
+  btn_reset->Disable();
+  btn_export->Disable();
+  cmb_port->Enable();
+
+  lbl_adc_val->SetText(L"---");
+  lbl_vadc_val->SetText(L"---");
+  lbl_delta_val->SetText(L"---");
+  lbl_strain_val->SetText(L"---");
+  lbl_stress_val->SetText(L"---");
+  lbl_defl_val->SetText(L"---");
+  lbl_vcc_val->SetText(L"---");
+
+  ScanComPorts(cmb_port);
 }
