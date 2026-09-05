@@ -19,7 +19,12 @@
 #include <stdlib.h>     // wcstof, wcstol
 #include <string.h>     // wcslen, wcsstr, wcschr
 
-// Wrapper classes — compiled separately but their headers are stable
+// Direct2D and DirectWrite - used by D2Dwindow and D2DPlotPanel
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <dwrite.h>
+
+// Wrapper classes - compiled separately but their headers are stable
 #include "wrappers\win32Wrappers\UIElement.h"
 #include "wrappers\win32Wrappers\Window.h"
 #include "wrappers\win32Wrappers\Button.h"
