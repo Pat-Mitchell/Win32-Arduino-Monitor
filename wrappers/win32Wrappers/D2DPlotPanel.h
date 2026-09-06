@@ -43,12 +43,23 @@ class D2DPlotPanel {
       , clr_marker(D2DPlotColors::MarkerDef())
       , pStrokeDash(nullptr)
     {
-      wcsncpy(arr_title, szTitle, 63);
-      arr_title[63] = L'\0';
-      wcsncpy(arr_label_x, szLabelX, 31);
-      arr_label_x[31] = L'\0';
-      wcsncpy(arr_label_y, szLabelY, 31);
-      arr_label_y[31] = L'\0';
+      arr_title[0] = L'\0';
+      if(szTitle) {
+        wcsncpy(arr_title, szTitle, 63);
+        arr_title[63] = L'\0';
+      }
+
+      arr_label_x[0] = L'\0';
+      if(szLabelX) {
+        wcsncpy(arr_label_x, szLabelX, 31);
+        arr_label_x[31] = L'\0';
+      }
+
+      arr_label_y[0] = L'\0';
+      if(szLabelY) {
+        wcsncpy(arr_label_y, szLabelY, 31);
+        arr_label_y[31] = L'\0';
+      }
 
       // Create the dashed stroke style for marker lines
       // Device-independent. Created from factory. Survives device loss
@@ -173,7 +184,7 @@ class D2DPlotPanel {
       // Marker line
       // Drawn before the curve so the curve renders on top of it.
       if(bMarkerVisible && fYMax != fYMin) {
-        float fMarkerY = fYMin + fMarkerNorm + (fYMax - fYMin);
+        float fMarkerY = fYMin + fMarkerNorm * (fYMax - fYMin);
         float fPx = MapY(fMarkerY, fYMin, fYMax, rcPlot);
         auto* pBrush = MakeBrush(pRT, clr_marker);
         if(pBrush) {
@@ -239,16 +250,24 @@ class D2DPlotPanel {
     // Text helper
     // ────── ⋆⋅☆⋅⋆ ────────
     static void PutText(ID2D1HwndRenderTarget* pRT, IDWriteFactory* pDWrite, IDWriteTextFormat* pFmt, const wchar_t* szText, D2D1::ColorF clr, D2D1_RECT_F rcLayout, DWRITE_TEXT_ALIGNMENT eAlign) {
-      if(!szText || !pFmt || !pRT) {
+      if(!szText || !pFmt || !pRT || !pDWrite) {
         return;
       }
-      pFmt->SetTextAlignment(eAlign);
-      pFmt->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+      UINT32 len = static_cast<UINT32>(wcslen(szText));
+      IDWriteTextLayout* pLayout = nullptr;
+      
+      if(SUCCEEDED(pDWrite->CreateTextLayout(szText, len, pFmt, rcLayout.right - rcLayout.left, rcLayout.bottom - rcLayout.top, &pLayout))) {
+        
+        // Mutate the local layout, not the globally shared text format
+        pLayout->SetTextAlignment(eAlign);
+        pLayout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-      auto* pBrush = MakeBrush(pRT, clr);
-      if(pBrush) {
-        pRT->DrawText(szText, (UINT32)wcslen(szText), pFmt, rcLayout, pBrush);
-        pBrush->Release();
+        auto* pBrush = MakeBrush(pRT, clr);
+        if(pBrush) {
+          pRT->DrawTextLayout(D2D1::Point2F(rcLayout.left, rcLayout.top), pLayout, pBrush);
+          pBrush->Release();
+        }
+        pLayout->Release();
       }
     }
 

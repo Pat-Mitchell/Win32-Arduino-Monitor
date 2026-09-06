@@ -55,8 +55,11 @@ D2DWindow::~D2DWindow() {
     pDWrite = nullptr;
   }  
 
-  // Release device-dependent resources (render target)
-  DiscardDeviceResources();
+  // Release device-dependent resources directly
+  if(pRT) { 
+    pRT->Release(); 
+    pRT = nullptr; 
+  }
 
   // Release shared factory when last window closes
   if(--s_iRefCount == 0) {
@@ -69,7 +72,7 @@ D2DWindow::~D2DWindow() {
 // ────── ⋆⋅☆⋅⋆ ────────
 
 HRESULT D2DWindow::CreateDeviceResources() {
-  if(pRT) {
+  if(pRT && pDWrite) {
     return S_OK; // Already exists
   }
 
@@ -77,35 +80,43 @@ HRESULT D2DWindow::CreateDeviceResources() {
     return E_FAIL; // InitD2D() not called
   }
 
+  HRESULT hr = S_OK;
+
   // Render target
-  RECT rcClient;
-  GetClientRect(hwnd_self, &rcClient);
+  if(!pRT) {
+    RECT rcClient;
+    GetClientRect(hwnd_self, &rcClient);
 
-  HRESULT hr = s_pFactory->CreateHwndRenderTarget(
-    D2D1::RenderTargetProperties(),
-    D2D1::HwndRenderTargetProperties(
-      hwnd_self,
-      D2D1::SizeU(rcClient.right - rcClient.left, rcClient.bottom - rcClient.top)
-    ),
-    &pRT
-  );
+    hr = s_pFactory->CreateHwndRenderTarget(
+      D2D1::RenderTargetProperties(),
+      D2D1::HwndRenderTargetProperties(
+        hwnd_self,
+        D2D1::SizeU(rcClient.right - rcClient.left, rcClient.bottom - rcClient.top)
+      ),
+      &pRT
+    );
 
-  if(FAILED(hr)) {
-    return hr;
+    if(FAILED(hr)) {
+      return hr;
+    }
+
+    // Anti-aliased geometry. Diagonallines and curves are smooth.
+    pRT->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+
+    // ClearType text anti-aliasing via DirectWrite
+    pRT->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
   }
-
-  // Anti-aliased geometry. Diagonallines and curves are smooth.
-  pRT->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
-
-  // ClearType text anti-aliasing via DirectWrite
-  pRT->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
 
   // DirectWrite factory and text formats
   // Device-independent. Create once, survive device loss.
-  // Duard with nullptr check so they survive render target recreation
+  // Guard with nullptr check so they survive render target recreation
   if(!pDWrite) {
     hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pDWrite));
     if(FAILED(hr)) {
+      if(pRT) {
+        pRT->Release();
+        pRT = nullptr;
+      }
       return hr;
     }
 
@@ -135,7 +146,7 @@ HRESULT D2DWindow::CreateDeviceResources() {
       DWRITE_FONT_STRETCH_NORMAL,
       16.0f, L"en-us", &pFmtTitle
     );
-  }
+  }  
 
   return S_OK;
 }
@@ -238,17 +249,24 @@ ID2D1SolidColorBrush* D2DWindow::CreateBrush(D2D1::ColorF color) const {
 }
 
 void D2DWindow::DrawTextAt(ID2D1HwndRenderTarget* pRT, const wchar_t* szText, IDWriteTextFormat* pFmt, D2D1::ColorF clr, D2D1_RECT_F rcLayout, DWRITE_TEXT_ALIGNMENT eAlign) const {
-  if(!szText || !pFmt || !pRT) {
+  if(!szText || !pFmt || !pRT || !pDWrite) {
     return;
   }
 
-  // Text alignment is a property of the format. set and restore
-  pFmt->SetTextAlignment(eAlign);
-  pFmt->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+  UINT32 len = static_cast<UINT32>(wcslen(szText));
+  IDWriteTextLayout* pLayout = nullptr;
 
-  ID2D1SolidColorBrush* pBrush = nullptr;
-  if(SUCCEEDED(pRT->CreateSolidColorBrush(clr, &pBrush))) {
-    pRT->DrawText(szText, static_cast<UINT32>(wcslen(szText)), pFmt, rcLayout,pBrush);
-    pBrush->Release();
+  if(SUCCEEDED(pDWrite->CreateTextLayout(szText, len, pFmt, rcLayout.right - rcLayout.left, rcLayout.bottom - rcLayout.top, &pLayout))) {
+    
+    // Mutate the local layout, not the globally shared text format
+    pLayout->SetTextAlignment(eAlign);
+    pLayout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    ID2D1SolidColorBrush* pBrush = nullptr;
+    if(SUCCEEDED(pRT->CreateSolidColorBrush(clr, &pBrush))) {
+      pRT->DrawTextLayout(D2D1::Point2F(rcLayout.left, rcLayout.top), pLayout, pBrush);
+      pBrush->Release();
+    }
+    pLayout->Release();
   }
 }

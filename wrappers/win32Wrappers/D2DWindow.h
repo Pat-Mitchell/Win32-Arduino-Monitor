@@ -15,6 +15,10 @@ class D2DWindow : public Window {
     D2DWindow();
     virtual ~D2DWindow();
 
+    // Delete copy semantics to prevent s_iRefCount corruption
+    D2DWindow(const D2DWindow&) = delete;
+    D2DWindow& operator=(const D2DWindow&) = delete;
+
     // ────── ⋆⋅☆⋅⋆ ────────
     //    App lifecycle
     // Call once from WinMain
