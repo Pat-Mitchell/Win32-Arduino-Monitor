@@ -53,3 +53,29 @@ $$t = 1.1 \times R \times C$$
 - Setting the Latch: Pressing Push-Button 1 pulls Pin 2 to $0 V (<{1 \over 3} V_{cc})$. The filp-flop is SET, driving Pin 3 HIGH. It stays HIGH even after releaseing the button.
 
 - Resetting the Latch: Pressing Push-Button 2 pulls Pin 4 to 0V. The flip-flop is REST, driving Pin 3 LOW. It stays LOW even after releaseing the button.
+
+## Example: 555 Timer cirsuit that turns on an LED for 5 seconds
+
+**Component Values**
+
+The duration $t$ of the output pulse in monostable mode is defined as :
+
+$$t = 1.1 \times R \times V$$
+
+Where:
+
+- $t$ = Output pulse time in seconds (5s)
+
+- $R$ = Timing resistor in Ohms
+
+- $C$ = Timing capacitor in Farads
+
+Using a standard $100\,\mu\text{F}$ electrolytic capacitor,
+
+$$R = {t \over 1.1 \times C} = {5 \over 1.1 \times 0.0001} = {5 \over 0.00011} \approx 45,455 (45.5 \text{k}\Omega)$$
+
+(Exact resistance is achieveable with a potentiometer or "close enough" is obtainable through combining resistors).
+
+Assuming a standard 9V power supply and a red LED ($V_{cc} = 9V, V_f \approx 2.0V, \text {target current} i_f \approx 15 \text{mA}$):
+
+$$R_{LED} = {V_{cc} - V_f \over I_f} = {9V - 2.0V \over 0.015A} \approx 466 \Omega \rightarrow 470 \Omega$$
